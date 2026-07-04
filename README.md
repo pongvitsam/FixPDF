@@ -1,14 +1,17 @@
 # FixPDF
 
-Fast, lightweight web PDF editor inspired by modern browser-first PDF tools. View, annotate, merge, split, rotate, search, and export PDFs entirely in the browser.
+[![Deploy GitHub Pages](https://github.com/pongvitsam/FixPDF/actions/workflows/deploy.yml/badge.svg)](https://github.com/pongvitsam/FixPDF/actions/workflows/deploy.yml)
+
+Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt, search, and export PDFs entirely in the browser.
 
 **Live demo:** https://pongvitsam.github.io/FixPDF/
 
 ## Features
 
 ### Viewer
-- Open PDF from file picker (with drag-and-drop friendly workflow)
+- Open PDF (file picker or drag & drop)
 - Zoom, pan, page navigation, thumbnail strip
+- Print current document
 - Light / dark / system theme
 
 ### Page tools
@@ -21,9 +24,10 @@ Fast, lightweight web PDF editor inspired by modern browser-first PDF tools. Vie
 - Split into single pages or extract page ranges
 - Rotate all pages
 - Watermark, crop margins
-- Export current page as PNG/JPG
+- Export page as PNG / JPG / WebP
 - View metadata
 - OCR current page (Tesseract.js, lazy-loaded)
+- Encrypt / decrypt PDF
 - Form field filler
 - Apply redaction marks
 
@@ -51,25 +55,27 @@ npm run build
 npm run preview
 ```
 
-## GitHub Pages
+## GitHub Pages setup (one-time)
 
-A workflow in `.github/workflows/deploy.yml` builds and deploys on every push to `main`.
+The workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds `dist/` and publishes via **GitHub Actions** (not the `gh-pages` branch).
 
-1. Open **Settings → Pages** in the GitHub repository
-2. Set **Source** to **GitHub Actions**
-3. Push to `main`
+1. Open [FixPDF Settings → Pages](https://github.com/pongvitsam/FixPDF/settings/pages)
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**
+3. Push to `main` (or run the workflow manually from the **Actions** tab)
+4. On first deploy, approve the **`github-pages`** environment if GitHub prompts you
+5. The site will be live at https://pongvitsam.github.io/FixPDF/ within 1–2 minutes
 
-The app is served from `/FixPDF/` on GitHub Pages.
+If the site still shows 404, Pages is almost always not set to **GitHub Actions** yet. Check the latest **Deploy GitHub Pages** run in the Actions tab for errors.
 
 ## Tech stack
 
 - Vite + React + TypeScript
 - PDF.js (rendering & search)
-- pdf-lib (merge, split, rotate, forms, annotations)
+- pdf-lib (merge, split, rotate, forms, annotations, encryption)
 - Tesseract.js (optional OCR)
 - i18next (EN/TH)
 - Tailwind CSS v4
 
 ## Privacy
 
-All PDF processing happens locally in your browser. Files are never uploaded to a server.
+All PDF processing happens locally in your browser. Files are never uploaded to any server.
