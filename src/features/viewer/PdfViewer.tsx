@@ -229,7 +229,14 @@ export function PdfViewer() {
         {pageAnnotations.map((annotation) => (
           <div
             key={annotation.id}
-            className="pointer-events-none absolute border"
+            role="button"
+            tabIndex={0}
+            className="absolute border cursor-pointer"
+            onClick={(event) => {
+              event.stopPropagation()
+              dispatch({ type: 'SET_SELECTED_ANNOTATION', id: annotation.id })
+              dispatch({ type: 'SET_PANEL', panel: 'inspector' })
+            }}
             style={{
               left: annotation.x,
               top: annotation.y,

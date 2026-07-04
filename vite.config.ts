@@ -10,6 +10,22 @@ const qpdfWasmSource = resolve(
   __dirname,
   'node_modules/@neslinesli93/qpdf-wasm/dist/qpdf.wasm',
 )
+const pdfiumWasmSource = resolve(
+  __dirname,
+  'node_modules/clawpdf/dist/vendor/pdfium.esm.wasm',
+)
+
+function copyWasmAssets(publicDir: string, outDir?: string) {
+  mkdirSync(publicDir, { recursive: true })
+  if (existsSync(qpdfWasmSource)) {
+    copyFileSync(qpdfWasmSource, resolve(publicDir, 'qpdf.wasm'))
+    if (outDir) copyFileSync(qpdfWasmSource, resolve(outDir, 'qpdf.wasm'))
+  }
+  if (existsSync(pdfiumWasmSource)) {
+    copyFileSync(pdfiumWasmSource, resolve(publicDir, 'pdfium.esm.wasm'))
+    if (outDir) copyFileSync(pdfiumWasmSource, resolve(outDir, 'pdfium.esm.wasm'))
+  }
+}
 
 export default defineConfig({
   base,
@@ -17,13 +33,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     {
-      name: 'copy-qpdf-wasm',
+      name: 'copy-wasm-assets',
       buildStart() {
-        const publicDir = resolve(__dirname, 'public')
-        mkdirSync(publicDir, { recursive: true })
-        if (existsSync(qpdfWasmSource)) {
-          copyFileSync(qpdfWasmSource, resolve(publicDir, 'qpdf.wasm'))
-        }
+        copyWasmAssets(resolve(__dirname, 'public'))
       },
       closeBundle() {
         const outDir = resolve(__dirname, 'dist')
@@ -36,17 +48,15 @@ export default defineConfig({
         if (existsSync(nojekyll)) {
           copyFileSync(nojekyll, resolve(outDir, '.nojekyll'))
         }
-        if (existsSync(qpdfWasmSource)) {
-          copyFileSync(qpdfWasmSource, resolve(outDir, 'qpdf.wasm'))
-        }
+        copyWasmAssets(resolve(__dirname, 'public'), outDir)
       },
     },
   ],
   build: {
-    chunkSizeWarningLimit: 1600,
+    chunkSizeWarningLimit: 2000,
   },
   optimizeDeps: {
-    exclude: ['tesseract.js', '@neslinesli93/qpdf-wasm'],
+    exclude: ['tesseract.js', '@neslinesli93/qpdf-wasm', 'clawpdf'],
   },
   worker: {
     format: 'es',

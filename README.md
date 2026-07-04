@@ -39,9 +39,16 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 ### Search
 - Find text in document with optional case matching
 
-### Settings
-- English and Thai UI
-- Theme preferences
+### Document structure
+- Bookmarks panel (outline navigation)
+- Attachments panel (download embedded files)
+- Forms panel (scan and fill all fields)
+- Preflight check (document health validation)
+- Annotation inspector with undo/redo history
+
+### Engines
+- PDFium WASM (clawpdf) for text extraction and page rendering
+- QPDF WASM for decrypt, compress, linearize, optimize
 
 ## Development
 
@@ -76,6 +83,7 @@ If the site still shows 404, Pages is almost always not set to **GitHub Actions*
 - pdf-lib (merge, split, rotate, forms, annotations)
 - @pdfsmaller/pdf-encrypt-lite (password protection)
 - @neslinesli93/qpdf-wasm (native decrypt, compress, linearize, optimize)
+- clawpdf / PDFium WASM (text extraction, high-quality render)
 - Tesseract.js (optional OCR)
 - i18next (EN/TH)
 - Tailwind CSS v4

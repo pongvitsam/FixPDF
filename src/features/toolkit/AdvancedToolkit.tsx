@@ -8,6 +8,7 @@ import {
   Layers2,
   Minimize2,
   Rocket,
+  Scan,
   Scissors,
   Trash2,
   Zap,
@@ -16,6 +17,7 @@ import { Button, Field, Input, Panel } from '../../components/ui'
 import { downloadBlob } from '../../lib/files'
 import { showToast } from '../../components/Toast'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
+import { pdfiumExtractText, pdfiumRenderPagePng } from '../../lib/pdf/pdfium'
 import {
   addPageNumbers,
   compressPdf,
@@ -33,7 +35,7 @@ import { loadPdfDocument, renderPageToImage } from '../../lib/pdf/viewer'
 
 export function AdvancedToolkit() {
   const { t } = useTranslation()
-  const { bytes, fileName, pdfPassword, replaceBytes } = usePdf()
+  const { bytes, fileName, pdfPassword, currentPage, replaceBytes } = usePdf()
   const dispatch = usePdfDispatch()
   const [interval, setInterval] = useState('5')
   const [title, setTitle] = useState('')
@@ -64,6 +66,37 @@ export function AdvancedToolkit() {
 
   return (
     <div className="space-y-3">
+      <Panel title={t('toolkit.pdfiumTitle')}>
+        <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.pdfiumHint')}</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const text = await pdfiumExtractText(bytes, pdfPassword ?? undefined)
+                setExtractedText(text)
+                downloadBlob(new Blob([text], { type: 'text/plain' }), `${fileName.replace(/\.pdf$/i, '')}-pdfium.txt`)
+              })
+            }
+          >
+            <Scan className="size-4" /> {t('toolkit.pdfiumExtract')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const png = await pdfiumRenderPagePng(bytes, currentPage, pdfPassword ?? undefined)
+                downloadBlob(new Blob([png.slice()], { type: 'image/png' }), `${fileName.replace(/\.pdf$/i, '')}-pdfium-p${currentPage + 1}.png`)
+              })
+            }
+          >
+            <FileImage className="size-4" /> {t('toolkit.pdfiumRender')}
+          </Button>
+        </div>
+      </Panel>
+
       <Panel title={t('toolkit.wasmTitle')}>
         <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.wasmHint')}</p>
         <div className="grid grid-cols-2 gap-2">

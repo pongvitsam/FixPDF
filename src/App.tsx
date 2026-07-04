@@ -1,11 +1,16 @@
 import {
+  Bookmark,
+  ClipboardCheck,
+  FileInput,
   FileText,
   Hand,
   Home,
+  Info,
   Layers3,
   Minus,
   MousePointer2,
   Moon,
+  Paperclip,
   Plus,
   Printer,
   RotateCw,
@@ -26,6 +31,11 @@ import { SearchPanel } from './features/search/SearchPanel'
 import { SettingsPanel } from './features/settings/SettingsPanel'
 import { ToolkitPanel } from './features/toolkit/ToolkitPanel'
 import { AdvancedToolkit } from './features/toolkit/AdvancedToolkit'
+import { BookmarksPanel } from './features/bookmarks/BookmarksPanel'
+import { AttachmentsPanel } from './features/attachments/AttachmentsPanel'
+import { FormsPanel } from './features/forms/FormsPanel'
+import { PreflightPanel } from './features/preflight/PreflightPanel'
+import { InspectorPanel } from './features/inspector/InspectorPanel'
 import { PdfViewer, ThumbnailStrip } from './features/viewer/PdfViewer'
 import type { SidebarPanel } from './types'
 
@@ -36,6 +46,11 @@ const navItems: { id: SidebarPanel; icon: typeof Home; label: string }[] = [
   { id: 'toolkit', icon: Wrench, label: 'nav.toolkit' },
   { id: 'annotate', icon: StickyNote, label: 'nav.annotate' },
   { id: 'search', icon: Search, label: 'nav.search' },
+  { id: 'bookmarks', icon: Bookmark, label: 'nav.bookmarks' },
+  { id: 'forms', icon: FileInput, label: 'nav.forms' },
+  { id: 'attachments', icon: Paperclip, label: 'nav.attachments' },
+  { id: 'preflight', icon: ClipboardCheck, label: 'nav.preflight' },
+  { id: 'inspector', icon: Info, label: 'nav.inspector' },
   { id: 'settings', icon: Settings, label: 'nav.settings' },
 ]
 
@@ -66,6 +81,11 @@ function SidebarContent() {
   if (panel === 'toolkit') return <div className="space-y-4 p-4"><ToolkitPanel /><AdvancedToolkit /></div>
   if (panel === 'annotate') return <div className="p-4"><AnnotatePanel /></div>
   if (panel === 'search') return <div className="p-4"><SearchPanel /></div>
+  if (panel === 'bookmarks') return <div className="p-4"><BookmarksPanel /></div>
+  if (panel === 'forms') return <div className="p-4"><FormsPanel /></div>
+  if (panel === 'attachments') return <div className="p-4"><AttachmentsPanel /></div>
+  if (panel === 'preflight') return <div className="p-4"><PreflightPanel /></div>
+  if (panel === 'inspector') return <div className="p-4"><InspectorPanel /></div>
   if (panel === 'settings') return <div className="p-4"><SettingsPanel /></div>
 
   return (
@@ -133,7 +153,7 @@ export default function App() {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <nav className="flex w-16 shrink-0 flex-col gap-1 border-r border-[var(--border)] bg-[var(--surface)] p-2 print:hidden">
+        <nav className="flex w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-2 print:hidden">
           {navItems.map(({ id, icon: Icon, label }) => (
             <button
               key={id}

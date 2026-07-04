@@ -21,7 +21,12 @@
     "toolkit": "Toolkit",
     "annotate": "Annotate",
     "search": "Search",
-    "settings": "Settings"
+    "settings": "Settings",
+    "bookmarks": "Bookmarks",
+    "forms": "Forms",
+    "attachments": "Attachments",
+    "preflight": "Preflight",
+    "inspector": "Inspector"
   },
   "viewer": {
     "zoomIn": "Zoom in",
@@ -83,7 +88,39 @@
     "compress": "Compress PDF",
     "linearize": "Linearize (fast web view)",
     "optimize": "Optimize PDF",
-    "stripMetadata": "Strip metadata (QPDF)"
+    "stripMetadata": "Strip metadata (QPDF)",
+    "pdfiumTitle": "PDFium engine (WASM)",
+    "pdfiumHint": "High-quality text extraction and page rendering via Google PDFium.",
+    "pdfiumExtract": "Extract text (PDFium)",
+    "pdfiumRender": "Render page PNG (PDFium)"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "empty": "No bookmarks in this document",
+    "hint": "Click a bookmark to jump to that page"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "empty": "No embedded attachments"
+  },
+  "preflight": {
+    "title": "Preflight check",
+    "hint": "Validate document health before sharing or printing",
+    "run": "Run preflight",
+    "running": "Running preflight…",
+    "status": {
+      "pass": "OK",
+      "warn": "Warn",
+      "fail": "Fail"
+    }
+  },
+  "inspector": {
+    "title": "Annotation inspector",
+    "empty": "Click an annotation on the page to inspect it",
+    "kind": "Type",
+    "position": "Position",
+    "size": "Size",
+    "goToPage": "Go to page"
   },
   "annotate": {
     "title": "Annotations",
@@ -128,7 +165,10 @@
     "title": "Form fields",
     "fieldName": "Field name",
     "value": "Value",
-    "fill": "Fill field"
+    "fill": "Fill field",
+    "scan": "Scan form fields",
+    "empty": "No form fields found",
+    "fillAll": "Fill all fields"
   },
   "security": {
     "passwordRequired": "Password required",

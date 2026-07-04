@@ -21,7 +21,12 @@
     "toolkit": "เครื่องมือ",
     "annotate": "ใส่หมายเหตุ",
     "search": "ค้นหา",
-    "settings": "ตั้งค่า"
+    "settings": "ตั้งค่า",
+    "bookmarks": "บุ๊กมาร์ก",
+    "forms": "ฟอร์ม",
+    "attachments": "ไฟล์แนบ",
+    "preflight": "Preflight",
+    "inspector": "ตรวจสอบ"
   },
   "viewer": {
     "zoomIn": "ซูมเข้า",
@@ -83,7 +88,39 @@
     "compress": "บีบอัด PDF",
     "linearize": "Linearize (โหลดเร็วบนเว็บ)",
     "optimize": "Optimize PDF",
-    "stripMetadata": "ลบ metadata (QPDF)"
+    "stripMetadata": "ลบ metadata (QPDF)",
+    "pdfiumTitle": "PDFium engine (WASM)",
+    "pdfiumHint": "ดึงข้อความและ render หน้าด้วย Google PDFium",
+    "pdfiumExtract": "ดึงข้อความ (PDFium)",
+    "pdfiumRender": "Render PNG (PDFium)"
+  },
+  "bookmarks": {
+    "title": "บุ๊กมาร์ก",
+    "empty": "ไม่มีบุ๊กมาร์กในเอกสารนี้",
+    "hint": "คลิกบุ๊กมาร์กเพื่อไปยังหน้านั้น"
+  },
+  "attachments": {
+    "title": "ไฟล์แนบ",
+    "empty": "ไม่มีไฟล์แนบในเอกสาร"
+  },
+  "preflight": {
+    "title": "ตรวจสอบ Preflight",
+    "hint": "ตรวจสุขภาพเอกสารก่อนแชร์หรือพิมพ์",
+    "run": "รัน Preflight",
+    "running": "กำลังตรวจสอบ…",
+    "status": {
+      "pass": "ผ่าน",
+      "warn": "เตือน",
+      "fail": "ล้มเหลว"
+    }
+  },
+  "inspector": {
+    "title": "ตรวจสอบหมายเหตุ",
+    "empty": "คลิกหมายเหตุบนหน้า PDF เพื่อดูรายละเอียด",
+    "kind": "ประเภท",
+    "position": "ตำแหน่ง",
+    "size": "ขนาด",
+    "goToPage": "ไปยังหน้า"
   },
   "annotate": {
     "title": "หมายเหตุ",
@@ -128,7 +165,10 @@
     "title": "ฟิลด์ฟอร์ม",
     "fieldName": "ชื่อฟิลด์",
     "value": "ค่า",
-    "fill": "กรอกฟิลด์"
+    "fill": "กรอกฟิลด์",
+    "scan": "สแกนฟิลด์ฟอร์ม",
+    "empty": "ไม่พบฟิลด์ฟอร์ม",
+    "fillAll": "กรอกทุกฟิลด์"
   },
   "security": {
     "passwordRequired": "ต้องใช้รหัสผ่าน",

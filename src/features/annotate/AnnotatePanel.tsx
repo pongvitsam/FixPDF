@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Eraser, Highlighter, MessageSquare, Square, Strikethrough, Type, Underline } from 'lucide-react'
+import { Eraser, Highlighter, MessageSquare, Redo2, Square, Strikethrough, Type, Underline, Undo2 } from 'lucide-react'
 import { Button, Panel } from '../../components/ui'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import type { AnnotationKind } from '../../types'
@@ -16,7 +16,7 @@ const kinds: { kind: AnnotationKind; icon: typeof Highlighter; label: string }[]
 
 export function AnnotatePanel() {
   const { t } = useTranslation()
-  const { annotateKind, annotations, commitAnnotations } = usePdf()
+  const { annotateKind, annotations, commitAnnotations, canUndoAnnotation, canRedoAnnotation } = usePdf()
   const dispatch = usePdfDispatch()
 
   return (
@@ -43,6 +43,12 @@ export function AnnotatePanel() {
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm text-[var(--muted)]">{t('annotate.itemCount', { count: annotations.length })}</span>
           <div className="flex gap-2">
+            <Button variant="outline" disabled={!canUndoAnnotation} onClick={() => dispatch({ type: 'UNDO_ANNOTATION' })}>
+              <Undo2 className="size-4" />
+            </Button>
+            <Button variant="outline" disabled={!canRedoAnnotation} onClick={() => dispatch({ type: 'REDO_ANNOTATION' })}>
+              <Redo2 className="size-4" />
+            </Button>
             <Button variant="outline" onClick={() => dispatch({ type: 'CLEAR_ANNOTATIONS' })}>
               {t('annotate.clearAll')}
             </Button>

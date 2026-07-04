@@ -46,6 +46,11 @@ type State = {
   pdfPassword: string | null
   activeSearchIndex: number
   fitWidthNonce: number
+  annotationHistory: Annotation[][]
+  annotationHistoryIndex: number
+  selectedAnnotationId: string | null
+  canUndoAnnotation: boolean
+  canRedoAnnotation: boolean
 }
 
 type Action =
@@ -69,6 +74,28 @@ type Action =
   | { type: 'SET_OCR'; text: string | null }
   | { type: 'SET_ACTIVE_SEARCH_INDEX'; index: number }
   | { type: 'REQUEST_FIT_WIDTH' }
+  | { type: 'UNDO_ANNOTATION' }
+  | { type: 'REDO_ANNOTATION' }
+  | { type: 'SET_SELECTED_ANNOTATION'; id: string | null }
+
+function withAnnotationHistory(state: State, annotations: Annotation[]) {
+  const head = state.annotationHistory.slice(0, state.annotationHistoryIndex + 1)
+  const next = [...head, annotations]
+  return {
+    annotations,
+    annotationHistory: next,
+    annotationHistoryIndex: next.length - 1,
+    canUndoAnnotation: next.length > 1,
+    canRedoAnnotation: false,
+  }
+}
+
+function annotationFlags(state: State) {
+  return {
+    canUndoAnnotation: state.annotationHistoryIndex > 0,
+    canRedoAnnotation: state.annotationHistoryIndex < state.annotationHistory.length - 1,
+  }
+}
 
 const initialState: State = {
   bytes: null,
@@ -94,6 +121,11 @@ const initialState: State = {
   pdfPassword: null,
   activeSearchIndex: 0,
   fitWidthNonce: 0,
+  annotationHistory: [[]],
+  annotationHistoryIndex: 0,
+  selectedAnnotationId: null,
+  canUndoAnnotation: false,
+  canRedoAnnotation: false,
 }
 
 function reducer(state: State, action: Action): State {
@@ -111,6 +143,11 @@ function reducer(state: State, action: Action): State {
         ocrText: null,
         pdfPassword: action.pdfPassword ?? null,
         activeSearchIndex: 0,
+        annotationHistory: [[]],
+        annotationHistoryIndex: 0,
+        selectedAnnotationId: null,
+        canUndoAnnotation: false,
+        canRedoAnnotation: false,
       }
     case 'SET_PAGE':
       return { ...state, currentPage: action.page }
@@ -129,9 +166,31 @@ function reducer(state: State, action: Action): State {
     case 'SET_ANNOTATIONS':
       return { ...state, annotations: action.annotations }
     case 'ADD_ANNOTATION':
-      return { ...state, annotations: [...state.annotations, action.annotation] }
+      return { ...state, ...withAnnotationHistory(state, [...state.annotations, action.annotation]) }
     case 'CLEAR_ANNOTATIONS':
-      return { ...state, annotations: [] }
+      return { ...state, ...withAnnotationHistory(state, []) }
+    case 'UNDO_ANNOTATION': {
+      if (state.annotationHistoryIndex <= 0) return state
+      const index = state.annotationHistoryIndex - 1
+      return {
+        ...state,
+        annotationHistoryIndex: index,
+        annotations: state.annotationHistory[index] ?? [],
+        ...annotationFlags({ ...state, annotationHistoryIndex: index }),
+      }
+    }
+    case 'REDO_ANNOTATION': {
+      if (state.annotationHistoryIndex >= state.annotationHistory.length - 1) return state
+      const index = state.annotationHistoryIndex + 1
+      return {
+        ...state,
+        annotationHistoryIndex: index,
+        annotations: state.annotationHistory[index] ?? [],
+        ...annotationFlags({ ...state, annotationHistoryIndex: index }),
+      }
+    }
+    case 'SET_SELECTED_ANNOTATION':
+      return { ...state, selectedAnnotationId: action.id }
     case 'SET_DRAFT':
       return { ...state, draftAnnotation: action.draft }
     case 'SET_ANNOTATE_KIND':

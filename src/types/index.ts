@@ -5,6 +5,11 @@ export type SidebarPanel =
   | 'toolkit'
   | 'annotate'
   | 'search'
+  | 'bookmarks'
+  | 'forms'
+  | 'attachments'
+  | 'preflight'
+  | 'inspector'
   | 'settings'
 
 export type ViewerTool = 'pan' | 'select'
