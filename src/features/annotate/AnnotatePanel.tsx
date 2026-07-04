@@ -36,14 +36,12 @@ export function AnnotatePanel() {
             </Button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-[var(--muted)]">
-          Drag on the page canvas to create an annotation.
-        </p>
+        <p className="mt-3 text-xs text-[var(--muted)]">{t('annotate.dragHint')}</p>
       </Panel>
 
       <Panel>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm text-[var(--muted)]">{annotations.length} items</span>
+          <span className="text-sm text-[var(--muted)]">{t('annotate.itemCount', { count: annotations.length })}</span>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => dispatch({ type: 'CLEAR_ANNOTATIONS' })}>
               {t('annotate.clearAll')}

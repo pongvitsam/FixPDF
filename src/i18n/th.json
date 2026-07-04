@@ -67,7 +67,17 @@
     "securityHint": "เข้ารหัสด้วยรหัสผ่าน หรือถอดการป้องกันโดยส่งออก PDF ใหม่โดยไม่มีการเข้ารหัส",
     "mergeHint": "เลือกไฟล์ PDF หลายไฟล์เพื่อรวม",
     "watermarkText": "ข้อความลายน้ำ",
-    "apply": "ใช้งาน"
+    "apply": "ใช้งาน",
+    "advanced": "เครื่องมือขั้นสูง",
+    "splitInterval": "แยกตามช่วง",
+    "splitIntervalSize": "จำนวนหน้าต่อไฟล์",
+    "flatten": "รวมฟอร์ม",
+    "pageNumbers": "ใส่เลขหน้า",
+    "removeMetadata": "ลบ metadata",
+    "imagesToPdf": "รูปภาพเป็น PDF",
+    "extractText": "ดึงข้อความทั้งหมด",
+    "exportAllPng": "ส่งออกทุกหน้า PNG",
+    "editMetadata": "แก้ไข metadata"
   },
   "annotate": {
     "title": "หมายเหตุ",
@@ -77,14 +87,19 @@
     "note": "โน้ต",
     "text": "ข้อความ",
     "rectangle": "สี่เหลี่ยม",
-    "clearAll": "ลบทั้งหมด"
+    "clearAll": "ลบทั้งหมด",
+    "dragHint": "ลากบนหน้า PDF เพื่อสร้างหมายเหตุ",
+    "itemCount": "{{count}} รายการ"
   },
   "search": {
     "title": "ค้นหาข้อความ",
     "placeholder": "ค้นหาในเอกสาร…",
     "matchCase": "ตรงตัวพิมพ์",
     "noMatches": "ไม่พบข้อความ",
-    "results": "พบ {{count}} รายการ"
+    "results": "พบ {{count}} รายการ",
+    "prev": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "current": "รายการที่ {{index}}"
   },
   "settings": {
     "title": "ตั้งค่า",
@@ -98,7 +113,10 @@
     "title": "ข้อมูลเอกสาร",
     "pages": "จำนวนหน้า",
     "size": "ขนาดไฟล์",
-    "encrypted": "เข้ารหัส"
+    "encrypted": "เข้ารหัส",
+    "titleLabel": "ชื่อเรื่อง",
+    "authorLabel": "ผู้แต่ง",
+    "subjectLabel": "หัวข้อ"
   },
   "form": {
     "title": "ฟิลด์ฟอร์ม",
@@ -113,6 +131,9 @@
     "unlock": "ปลดล็อก",
     "ownerPassword": "รหัสผ่านเจ้าของ",
     "ownerOptional": "ไม่บังคับ — ใช้รหัสผ่านผู้ใช้เป็นค่าเริ่มต้น"
+  },
+  "redact": {
+    "instructions": "วาดกล่องปิดบังในแผง Annotate แล้วกดใช้งานที่นี่"
   },
   "ocr": {
     "running": "กำลัง OCR…",

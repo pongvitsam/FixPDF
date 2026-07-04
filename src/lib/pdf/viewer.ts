@@ -106,7 +106,7 @@ export async function searchPdfText(
       .join(' ')
     const haystack = matchCase ? pageText : pageText.toLowerCase()
     if (haystack.includes(needle)) {
-      matches.push({ pageIndex, text: pageText.slice(0, 180) })
+      matches.push({ pageIndex, text: pageText.slice(0, 180), index: matches.length })
     }
   }
 

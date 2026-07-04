@@ -44,6 +44,7 @@ export type PdfMetadata = {
 export type SearchMatch = {
   pageIndex: number
   text: string
+  index: number
 }
 
 export type FormFieldInfo = {

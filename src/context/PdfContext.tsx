@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { PasswordDialog } from '../components/PasswordDialog'
+import { Toast, showToast } from '../components/Toast'
 import type {
   Annotation,
   AnnotationKind,
@@ -43,6 +44,8 @@ type State = {
   pageOrder: number[]
   ocrText: string | null
   pdfPassword: string | null
+  activeSearchIndex: number
+  fitWidthNonce: number
 }
 
 type Action =
@@ -64,6 +67,8 @@ type Action =
   | { type: 'SET_THEME'; theme: ThemeMode }
   | { type: 'SET_PAGE_ORDER'; order: number[]; pageCount: number }
   | { type: 'SET_OCR'; text: string | null }
+  | { type: 'SET_ACTIVE_SEARCH_INDEX'; index: number }
+  | { type: 'REQUEST_FIT_WIDTH' }
 
 const initialState: State = {
   bytes: null,
@@ -87,6 +92,8 @@ const initialState: State = {
   pageOrder: [],
   ocrText: null,
   pdfPassword: null,
+  activeSearchIndex: 0,
+  fitWidthNonce: 0,
 }
 
 function reducer(state: State, action: Action): State {
@@ -103,6 +110,7 @@ function reducer(state: State, action: Action): State {
         searchMatches: [],
         ocrText: null,
         pdfPassword: action.pdfPassword ?? null,
+        activeSearchIndex: 0,
       }
     case 'SET_PAGE':
       return { ...state, currentPage: action.page }
@@ -129,7 +137,7 @@ function reducer(state: State, action: Action): State {
     case 'SET_ANNOTATE_KIND':
       return { ...state, annotateKind: action.kind }
     case 'SET_SEARCH':
-      return { ...state, searchQuery: action.query, searchMatches: action.matches }
+      return { ...state, searchQuery: action.query, searchMatches: action.matches, activeSearchIndex: 0 }
     case 'SET_MATCH_CASE':
       return { ...state, matchCase: action.matchCase }
     case 'SET_THEME':
@@ -138,6 +146,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, pageOrder: action.order, pageCount: action.pageCount }
     case 'SET_OCR':
       return { ...state, ocrText: action.text }
+    case 'SET_ACTIVE_SEARCH_INDEX':
+      return { ...state, activeSearchIndex: action.index, currentPage: state.searchMatches[action.index]?.pageIndex ?? state.currentPage }
+    case 'REQUEST_FIT_WIDTH':
+      return { ...state, fitWidthNonce: state.fitWidthNonce + 1 }
     default:
       return state
   }
@@ -232,6 +244,7 @@ export function PdfProvider({ children }: { children: ReactNode }) {
       output = await applyAnnotations(state.bytes, state.annotations)
     }
     await savePdfBytes(output, state.fileName)
+    showToast('toast.saved')
   }, [state.annotations, state.bytes, state.fileName])
 
   const commitAnnotations = useCallback(async () => {
@@ -272,6 +285,7 @@ export function PdfProvider({ children }: { children: ReactNode }) {
     <PdfContext.Provider value={value}>
       {children}
       <PasswordDialog />
+      <Toast />
     </PdfContext.Provider>
   )
 }

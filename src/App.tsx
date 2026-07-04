@@ -4,9 +4,11 @@ import {
   Home,
   Layers3,
   Minus,
+  MousePointer2,
   Moon,
   Plus,
   Printer,
+  RotateCw,
   Save,
   Search,
   Settings,
@@ -23,6 +25,7 @@ import { PagesPanel } from './features/pages/PagesPanel'
 import { SearchPanel } from './features/search/SearchPanel'
 import { SettingsPanel } from './features/settings/SettingsPanel'
 import { ToolkitPanel } from './features/toolkit/ToolkitPanel'
+import { AdvancedToolkit } from './features/toolkit/AdvancedToolkit'
 import { PdfViewer, ThumbnailStrip } from './features/viewer/PdfViewer'
 import type { SidebarPanel } from './types'
 
@@ -48,9 +51,10 @@ function SidebarContent() {
           <p className="text-sm text-[var(--muted)]">{t('app.subtitle')}</p>
         </div>
         {metadata ? (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 text-sm">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 text-sm space-y-1">
             <div>{t('metadata.pages')}: {metadata.pageCount}</div>
             <div>{t('metadata.size')}: {(metadata.fileSize / 1024).toFixed(1)} KB</div>
+            {metadata.encrypted ? <div>{t('metadata.encrypted')}: ✓</div> : null}
           </div>
         ) : null}
         {!bytes ? <p className="text-sm text-[var(--muted)]">{t('app.noDocument')}</p> : null}
@@ -59,7 +63,7 @@ function SidebarContent() {
   }
 
   if (panel === 'pages') return <div className="p-4"><PagesPanel /></div>
-  if (panel === 'toolkit') return <div className="p-4"><ToolkitPanel /></div>
+  if (panel === 'toolkit') return <div className="space-y-4 p-4"><ToolkitPanel /><AdvancedToolkit /></div>
   if (panel === 'annotate') return <div className="p-4"><AnnotatePanel /></div>
   if (panel === 'search') return <div className="p-4"><SearchPanel /></div>
   if (panel === 'settings') return <div className="p-4"><SettingsPanel /></div>
@@ -81,6 +85,8 @@ export default function App() {
     currentPage,
     pageCount,
     zoom,
+    rotation,
+    viewerTool,
     busy,
     message,
     theme,
@@ -155,21 +161,34 @@ export default function App() {
               <StickyNote className="size-4" />
             </Button>
             <Button
-              variant="outline"
+              variant={viewerTool === 'pan' ? 'primary' : 'outline'}
               onClick={() => dispatch({ type: 'SET_VIEWER_TOOL', tool: 'pan' })}
             >
               <Hand className="size-4" /> {t('viewer.pan')}
             </Button>
+            <Button
+              variant={viewerTool === 'select' ? 'primary' : 'outline'}
+              onClick={() => dispatch({ type: 'SET_VIEWER_TOOL', tool: 'select' })}
+            >
+              <MousePointer2 className="size-4" /> {t('viewer.select')}
+            </Button>
             <div className="mx-2 h-6 w-px bg-[var(--border)]" />
-            <Button variant="outline" onClick={() => dispatch({ type: 'SET_ZOOM', zoom: Math.max(0.4, zoom - 0.1) })}>
+            <Button variant="outline" title={t('viewer.zoomOut')} onClick={() => dispatch({ type: 'SET_ZOOM', zoom: Math.max(0.4, zoom - 0.1) })}>
               <Minus className="size-4" />
             </Button>
             <span className="min-w-16 text-center text-sm">{Math.round(zoom * 100)}%</span>
-            <Button variant="outline" onClick={() => dispatch({ type: 'SET_ZOOM', zoom: Math.min(3, zoom + 0.1) })}>
+            <Button variant="outline" title={t('viewer.zoomIn')} onClick={() => dispatch({ type: 'SET_ZOOM', zoom: Math.min(3, zoom + 0.1) })}>
               <Plus className="size-4" />
             </Button>
-            <Button variant="outline" onClick={() => dispatch({ type: 'SET_ZOOM', zoom: 1.1 })}>
+            <Button variant="outline" onClick={() => dispatch({ type: 'REQUEST_FIT_WIDTH' })}>
               {t('viewer.fitWidth')}
+            </Button>
+            <Button
+              variant="outline"
+              disabled={!bytes}
+              onClick={() => dispatch({ type: 'SET_ROTATION', rotation: (rotation + 90) % 360 })}
+            >
+              <RotateCw className="size-4" />
             </Button>
             <div className="ml-auto flex items-center gap-2 text-sm">
               <Button

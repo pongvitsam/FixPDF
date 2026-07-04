@@ -67,7 +67,17 @@
     "securityHint": "Encrypt with a password, or remove protection by re-exporting without encryption.",
     "mergeHint": "Select multiple PDF files to merge",
     "watermarkText": "Watermark text",
-    "apply": "Apply"
+    "apply": "Apply",
+    "advanced": "Advanced tools",
+    "splitInterval": "Split by interval",
+    "splitIntervalSize": "Pages per file",
+    "flatten": "Flatten forms",
+    "pageNumbers": "Add page numbers",
+    "removeMetadata": "Remove metadata",
+    "imagesToPdf": "Images to PDF",
+    "extractText": "Extract all text",
+    "exportAllPng": "Export all pages PNG",
+    "editMetadata": "Edit metadata"
   },
   "annotate": {
     "title": "Annotations",
@@ -77,14 +87,19 @@
     "note": "Note",
     "text": "Text",
     "rectangle": "Rectangle",
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "dragHint": "Drag on the page canvas to create an annotation.",
+    "itemCount": "{{count}} items"
   },
   "search": {
     "title": "Search text",
     "placeholder": "Search in document…",
     "matchCase": "Match case",
     "noMatches": "No matches found",
-    "results": "{{count}} matches"
+    "results": "{{count}} matches",
+    "prev": "Previous",
+    "next": "Next",
+    "current": "Match {{index}}"
   },
   "settings": {
     "title": "Settings",
@@ -98,7 +113,10 @@
     "title": "Document metadata",
     "pages": "Pages",
     "size": "File size",
-    "encrypted": "Encrypted"
+    "encrypted": "Encrypted",
+    "titleLabel": "Title",
+    "authorLabel": "Author",
+    "subjectLabel": "Subject"
   },
   "form": {
     "title": "Form fields",
@@ -113,6 +131,9 @@
     "unlock": "Unlock",
     "ownerPassword": "Owner password",
     "ownerOptional": "Optional — defaults to user password"
+  },
+  "redact": {
+    "instructions": "Draw redaction boxes in the Annotate panel, then apply them here."
   },
   "ocr": {
     "running": "Running OCR…",

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { FileUp } from 'lucide-react'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import { readDroppedPdfFiles } from '../../lib/files'
+import { TextLayer } from 'pdfjs-dist'
 import { loadPdfDocument, renderPageToCanvas } from '../../lib/pdf/viewer'
 import type { AnnotationKind } from '../../types'
 
@@ -35,23 +36,32 @@ export function PdfViewer() {
     draftAnnotation,
     viewerTool,
     pdfPassword,
+    fitWidthNonce,
     openDocument,
     openFromFile,
   } = usePdf()
   const dispatch = usePdfDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const textLayerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const textLayerTaskRef = useRef<TextLayer | null>(null)
   const dragRef = useRef<{ x: number; y: number; active: boolean } | null>(null)
   const drawRef = useRef<{ x: number; y: number } | null>(null)
   const [viewport, setViewport] = useState({ width: 0, height: 0 })
+  const [pageWidth, setPageWidth] = useState(0)
 
   useEffect(() => {
     if (!bytes || !canvasRef.current) return
     let cancelled = false
+    textLayerTaskRef.current?.cancel()
 
     void (async () => {
       const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
       if (cancelled) return
+      const page = await pdf.getPage(currentPage + 1)
+      const baseViewport = page.getViewport({ scale: 1, rotation })
+      setPageWidth(baseViewport.width)
+
       const vp = await renderPageToCanvas(
         pdf,
         currentPage,
@@ -60,12 +70,33 @@ export function PdfViewer() {
         rotation,
       )
       setViewport({ width: vp.width, height: vp.height })
+
+      if (textLayerRef.current && viewerTool === 'select') {
+        textLayerRef.current.replaceChildren()
+        const textLayer = new TextLayer({
+          textContentSource: await page.getTextContent(),
+          container: textLayerRef.current,
+          viewport: vp,
+        })
+        textLayerTaskRef.current = textLayer
+        await textLayer.render()
+      } else if (textLayerRef.current) {
+        textLayerRef.current.replaceChildren()
+      }
     })()
 
     return () => {
       cancelled = true
+      textLayerTaskRef.current?.cancel()
     }
-  }, [bytes, currentPage, zoom, rotation, pdfPassword])
+  }, [bytes, currentPage, zoom, rotation, pdfPassword, viewerTool])
+
+  useEffect(() => {
+    if (!pageWidth || !containerRef.current) return
+    const available = containerRef.current.clientWidth - 48
+    const fitZoom = Math.min(3, Math.max(0.4, available / pageWidth))
+    dispatch({ type: 'SET_ZOOM', zoom: fitZoom })
+  }, [fitWidthNonce, pageWidth, dispatch])
 
   const onMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (!bytes) return
@@ -133,13 +164,13 @@ export function PdfViewer() {
           width: draftAnnotation.width,
           height: draftAnnotation.height,
           color: draftAnnotation.color ?? '#fde047',
-          text: draftAnnotation.kind === 'note' ? 'Note' : undefined,
+          text: draftAnnotation.kind === 'note' ? t('annotate.note') : undefined,
         },
       })
     }
     drawRef.current = null
     dispatch({ type: 'SET_DRAFT', draft: null })
-  }, [currentPage, dispatch, draftAnnotation])
+  }, [currentPage, dispatch, draftAnnotation, t])
 
   const onMouseUp = () => {
     dragRef.current = null
@@ -191,6 +222,10 @@ export function PdfViewer() {
         onMouseUp={onMouseUp}
       >
         <canvas ref={canvasRef} className="block max-w-none bg-white" />
+        <div
+          ref={textLayerRef}
+          className={`absolute inset-0 ${viewerTool === 'select' ? 'select-text' : 'pointer-events-none'}`}
+        />
         {pageAnnotations.map((annotation) => (
           <div
             key={annotation.id}
@@ -226,9 +261,10 @@ export function PdfViewer() {
 }
 
 export function ThumbnailStrip() {
-  const { bytes, currentPage, pageCount, pdfPassword } = usePdf()
+  const { bytes, currentPage, pageCount, pdfPassword, replaceBytes } = usePdf()
   const dispatch = usePdfDispatch()
   const [thumbs, setThumbs] = useState<string[]>([])
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
 
   useEffect(() => {
     if (!bytes) {
@@ -261,6 +297,27 @@ export function ThumbnailStrip() {
         <button
           key={index}
           type="button"
+          draggable
+          onDragStart={() => setDragIndex(index)}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={() => {
+            if (dragIndex === null || dragIndex === index || !bytes) return
+            void (async () => {
+              const order = Array.from({ length: pageCount }, (_, i) => i)
+              const [moved] = order.splice(dragIndex, 1)
+              order.splice(index, 0, moved)
+              const { reorderPages } = await import('../../lib/pdf/operations')
+              dispatch({ type: 'SET_BUSY', busy: true })
+              try {
+                const output = await reorderPages(bytes, order)
+                await replaceBytes(output)
+                dispatch({ type: 'SET_PAGE', page: index })
+              } finally {
+                dispatch({ type: 'SET_BUSY', busy: false })
+                setDragIndex(null)
+              }
+            })()
+          }}
           onClick={() => dispatch({ type: 'SET_PAGE', page: index })}
           className={`shrink-0 overflow-hidden rounded-lg border ${currentPage === index ? 'border-[var(--primary)]' : 'border-[var(--border)]'}`}
         >

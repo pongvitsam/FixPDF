@@ -131,6 +131,7 @@ export async function applyAnnotations(bytes: Uint8Array, annotations: Annotatio
     const page = doc.getPage(annotation.pageIndex)
     const { height } = page.getSize()
     const y = height - annotation.y - annotation.height
+    const color = parseHexColor(annotation.color)
 
     if (annotation.kind === 'redaction') {
       page.drawRectangle({
@@ -143,7 +144,53 @@ export async function applyAnnotations(bytes: Uint8Array, annotations: Annotatio
       continue
     }
 
-    const color = parseHexColor(annotation.color)
+    if (annotation.kind === 'underline') {
+      page.drawLine({
+        start: { x: annotation.x, y: y + 2 },
+        end: { x: annotation.x + annotation.width, y: y + 2 },
+        thickness: 2,
+        color,
+      })
+      continue
+    }
+
+    if (annotation.kind === 'strikeout') {
+      const mid = y + annotation.height / 2
+      page.drawLine({
+        start: { x: annotation.x, y: mid },
+        end: { x: annotation.x + annotation.width, y: mid },
+        thickness: 2,
+        color,
+      })
+      continue
+    }
+
+    if (annotation.kind === 'note' || annotation.kind === 'text') {
+      if (annotation.text) {
+        const font = await doc.embedFont(StandardFonts.Helvetica)
+        page.drawText(annotation.text, {
+          x: annotation.x + 4,
+          y: y + annotation.height - 14,
+          size: annotation.kind === 'note' ? 10 : 12,
+          font,
+          color: rgb(0.1, 0.1, 0.1),
+        })
+      }
+      if (annotation.kind === 'note') {
+        page.drawRectangle({
+          x: annotation.x,
+          y,
+          width: annotation.width,
+          height: annotation.height,
+          color,
+          opacity: 0.2,
+          borderWidth: 1,
+          borderColor: color,
+        })
+      }
+      continue
+    }
+
     page.drawRectangle({
       x: annotation.x,
       y,
@@ -154,17 +201,6 @@ export async function applyAnnotations(bytes: Uint8Array, annotations: Annotatio
       borderWidth: annotation.kind === 'rectangle' ? 2 : 0,
       borderColor: color,
     })
-
-    if (annotation.text) {
-      const font = await doc.embedFont(StandardFonts.Helvetica)
-      page.drawText(annotation.text, {
-        x: annotation.x + 4,
-        y: y + annotation.height - 14,
-        size: 11,
-        font,
-        color: rgb(0.1, 0.1, 0.1),
-      })
-    }
   }
 
   return doc.save()
@@ -182,15 +218,20 @@ export async function listFormFields(bytes: Uint8Array): Promise<FormFieldInfo[]
 export async function fillFormField(bytes: Uint8Array, name: string, value: string) {
   const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
   const form = doc.getForm()
-  try {
-    form.getTextField(name).setText(value)
-  } catch {
     try {
-      form.getDropdown(name).select(value)
+      form.getTextField(name).setText(value)
     } catch {
-      form.getCheckBox(name).check()
+      try {
+        form.getDropdown(name).select(value)
+      } catch {
+        const checkbox = form.getCheckBox(name)
+        if (value === 'true' || value === '1' || value.toLowerCase() === 'yes') {
+          checkbox.check()
+        } else {
+          checkbox.uncheck()
+        }
+      }
     }
-  }
   form.updateFieldAppearances()
   return doc.save()
 }
@@ -259,4 +300,99 @@ export async function unlockPasswordProtectedPdf(bytes: Uint8Array, password: st
   }
 
   return output.save()
+}
+
+export async function editPdfMetadata(
+  bytes: Uint8Array,
+  fields: { title?: string; author?: string; subject?: string },
+) {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  if (fields.title !== undefined) doc.setTitle(fields.title)
+  if (fields.author !== undefined) doc.setAuthor(fields.author)
+  if (fields.subject !== undefined) doc.setSubject(fields.subject)
+  return doc.save()
+}
+
+export async function removePdfMetadata(bytes: Uint8Array) {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  doc.setTitle('')
+  doc.setAuthor('')
+  doc.setSubject('')
+  doc.setKeywords([])
+  doc.setProducer('')
+  doc.setCreator('')
+  return doc.save()
+}
+
+export async function flattenPdf(bytes: Uint8Array) {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  const form = doc.getForm()
+  form.flatten()
+  return doc.save()
+}
+
+export async function splitPdfByInterval(bytes: Uint8Array, interval: number) {
+  const source = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  const indices = source.getPageIndices()
+  const outputs: Uint8Array[] = []
+
+  for (let start = 0; start < indices.length; start += interval) {
+    const chunk = indices.slice(start, start + interval)
+    const doc = await PDFDocument.create()
+    const pages = await doc.copyPages(source, chunk)
+    pages.forEach((page) => doc.addPage(page))
+    outputs.push(await doc.save())
+  }
+
+  return outputs
+}
+
+export async function addPageNumbers(bytes: Uint8Array, format = '{n} / {total}') {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const total = doc.getPageCount()
+
+  doc.getPages().forEach((page, index) => {
+    const { width } = page.getSize()
+    const label = format.replace('{n}', String(index + 1)).replace('{total}', String(total))
+    page.drawText(label, {
+      x: width / 2 - label.length * 3,
+      y: 18,
+      size: 10,
+      font,
+      color: rgb(0.35, 0.35, 0.35),
+    })
+  })
+
+  return doc.save()
+}
+
+export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
+  const doc = await PDFDocument.create()
+
+  for (const file of files) {
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const isPng = file.type === 'image/png' || file.name.toLowerCase().endsWith('.png')
+    const image = isPng ? await doc.embedPng(bytes) : await doc.embedJpg(bytes)
+    const page = doc.addPage([image.width, image.height])
+    page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height })
+  }
+
+  return doc.save()
+}
+
+export async function extractAllText(bytes: Uint8Array, password?: string) {
+  const { pdf } = await loadPdfDocument(bytes, password)
+  const parts: string[] = []
+
+  for (let pageIndex = 0; pageIndex < pdf.numPages; pageIndex += 1) {
+    const page = await pdf.getPage(pageIndex + 1)
+    const content = await page.getTextContent()
+    const pageText = content.items
+      .map((item) => ('str' in item ? item.str : ''))
+      .join(' ')
+    parts.push(`--- Page ${pageIndex + 1} ---\n${pageText}`)
+  }
+
+  return parts.join('\n\n')
 }

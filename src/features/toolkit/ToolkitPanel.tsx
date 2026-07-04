@@ -235,9 +235,9 @@ export function ToolkitPanel() {
                   [
                     `${t('metadata.pages')}: ${meta.pageCount}`,
                     `${t('metadata.size')}: ${formatBytes(bytes.byteLength)}`,
-                    meta.title ? `Title: ${meta.title}` : '',
-                    meta.author ? `Author: ${meta.author}` : '',
-                    meta.subject ? `Subject: ${meta.subject}` : '',
+                    meta.title ? `${t('metadata.titleLabel')}: ${meta.title}` : '',
+                    meta.author ? `${t('metadata.authorLabel')}: ${meta.author}` : '',
+                    meta.subject ? `${t('metadata.subjectLabel')}: ${meta.subject}` : '',
                   ]
                     .filter(Boolean)
                     .join('\n'),
@@ -412,9 +412,7 @@ function RedactionSection() {
 
   return (
     <Panel title={t('toolkit.redact')}>
-      <p className="mb-2 text-xs text-[var(--muted)]">
-        Draw redaction boxes in the Annotate panel, then apply them here.
-      </p>
+      <p className="mb-2 text-xs text-[var(--muted)]">{t('redact.instructions')}</p>
       <Button
         variant="primary"
         disabled={!annotations.some((item) => item.kind === 'redaction')}
