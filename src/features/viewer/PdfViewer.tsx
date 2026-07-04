@@ -91,6 +91,12 @@ export function PdfViewer() {
         if (controller.signal.aborted) return
         if (error instanceof pdfjsLib.RenderingCancelledException) return
         if (error instanceof DOMException && error.name === 'AbortError') return
+        if (
+          error instanceof Error &&
+          error.message.includes('Cannot use the same canvas during multiple render')
+        ) {
+          return
+        }
         throw error
       }
     })()

@@ -15,10 +15,17 @@ type CanvasRenderState = {
 
 const canvasRenderState = new WeakMap<HTMLCanvasElement, CanvasRenderState>()
 
-function beginCanvasRender(canvas: HTMLCanvasElement): number {
+async function beginCanvasRender(canvas: HTMLCanvasElement): Promise<number> {
   const prev = canvasRenderState.get(canvas)
   const generation = (prev?.generation ?? 0) + 1
-  prev?.task?.cancel()
+  if (prev?.task) {
+    prev.task.cancel()
+    try {
+      await prev.task.promise
+    } catch {
+      // Previous render was cancelled; safe to reuse the canvas.
+    }
+  }
   canvasRenderState.set(canvas, { generation, task: null })
   return generation
 }
@@ -82,7 +89,7 @@ export async function renderPageToCanvas(
   rotation = 0,
   options?: { signal?: AbortSignal },
 ) {
-  const generation = beginCanvasRender(canvas)
+  const generation = await beginCanvasRender(canvas)
 
   const page = await pdf.getPage(pageIndex + 1)
   if (options?.signal?.aborted || isCanvasRenderStale(canvas, generation)) {
