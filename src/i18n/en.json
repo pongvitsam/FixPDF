@@ -51,6 +51,10 @@
     "ocr": "OCR current page",
     "formFiller": "Form filler",
     "redact": "Apply redaction",
+    "encrypt": "Encrypt PDF",
+    "decrypt": "Remove password",
+    "password": "Password",
+    "print": "Print",
     "mergeHint": "Select multiple PDF files to merge",
     "watermarkText": "Watermark text",
     "apply": "Apply"

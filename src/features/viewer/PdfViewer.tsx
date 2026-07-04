@@ -230,7 +230,7 @@ export function ThumbnailStrip() {
   if (!bytes) return null
 
   return (
-    <div className="flex gap-2 overflow-x-auto border-t border-[var(--border)] p-3">
+    <div className="flex gap-2 overflow-x-auto border-t border-[var(--border)] p-3 print:hidden">
       {Array.from({ length: pageCount }).map((_, index) => (
         <button
           key={index}

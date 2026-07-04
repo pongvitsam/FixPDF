@@ -56,3 +56,13 @@ button:not(:disabled) {
   background: color-mix(in oklch, var(--muted) 40%, transparent);
   border-radius: 999px;
 }
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}

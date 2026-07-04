@@ -6,6 +6,7 @@ import {
   FileText,
   GitMerge,
   Layers3,
+  LockOpen,
   RotateCw,
   ScanText,
   Shield,
@@ -18,6 +19,7 @@ import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import {
   addWatermark,
   cropMargins,
+  decryptPdf,
   extractPageRange,
   mergePdfFiles,
   readPdfMetadata,
@@ -25,7 +27,6 @@ import {
   splitPdfAllPages,
 } from '../../lib/pdf/operations'
 import { loadPdfDocument, renderPageToImage } from '../../lib/pdf/viewer'
-import { runOcrFromCanvas } from '../../lib/pdf/ocr'
 
 export function ToolkitPanel() {
   const { t } = useTranslation()
@@ -206,6 +207,7 @@ export function ToolkitPanel() {
                 const canvas = document.createElement('canvas')
                 const { renderPageToCanvas } = await import('../../lib/pdf/viewer')
                 await renderPageToCanvas(pdf, currentPage, 2, canvas)
+                const { runOcrFromCanvas } = await import('../../lib/pdf/ocr')
                 const text = await runOcrFromCanvas(canvas)
                 setOcrText(text)
                 dispatch({ type: 'SET_OCR', text })
@@ -228,6 +230,24 @@ export function ToolkitPanel() {
           <pre className="max-h-48 overflow-auto whitespace-pre-wrap text-xs">{ocrText}</pre>
         </Panel>
       ) : null}
+
+      <Panel title={t('metadata.encrypted')}>
+        <p className="mb-3 text-xs text-[var(--muted)]">
+          Re-export the PDF without password protection. Full encryption requires desktop PDF tools.
+        </p>
+        <Button
+          disabled={!bytes}
+          onClick={() =>
+            void run(async () => {
+              if (!bytes) return
+              const output = await decryptPdf(bytes)
+              await replaceBytes(output)
+            })
+          }
+        >
+          <LockOpen className="size-4" /> {t('toolkit.decrypt')}
+        </Button>
+      </Panel>
 
       <FormFillerSection />
       <RedactionSection />

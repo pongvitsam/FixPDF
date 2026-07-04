@@ -215,3 +215,8 @@ export async function readPdfMetadata(bytes: Uint8Array) {
     subject: doc.getSubject() ?? undefined,
   }
 }
+
+export async function decryptPdf(bytes: Uint8Array) {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  return doc.save()
+}

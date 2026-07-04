@@ -6,6 +6,7 @@ import {
   Minus,
   Moon,
   Plus,
+  Printer,
   Save,
   Search,
   Settings,
@@ -16,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { Button } from './components/ui'
 import { usePdf, usePdfDispatch } from './context/PdfContext'
+import { savePdfBytes } from './lib/files'
 import { AnnotatePanel } from './features/annotate/AnnotatePanel'
 import { PagesPanel } from './features/pages/PagesPanel'
 import { SearchPanel } from './features/search/SearchPanel'
@@ -88,8 +90,8 @@ export default function App() {
   const dispatch = usePdfDispatch()
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+    <div className="flex min-h-screen flex-col print:block">
+      <header className="flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3 print:hidden">
         <div className="flex size-10 items-center justify-center rounded-2xl bg-[var(--primary)] font-bold text-[var(--primary-fg)]">
           FP
         </div>
@@ -100,6 +102,16 @@ export default function App() {
         <Button variant="outline" onClick={() => void openDocument()}>{t('app.openPdf')}</Button>
         <Button variant="primary" disabled={!bytes} onClick={() => void saveDocument()}>
           <Save className="size-4" /> {t('app.save')}
+        </Button>
+        <Button
+          variant="outline"
+          disabled={!bytes}
+          onClick={() => bytes && void savePdfBytes(bytes, fileName.replace(/\.pdf$/i, '') + '-copy.pdf')}
+        >
+          {t('app.saveAs')}
+        </Button>
+        <Button variant="outline" disabled={!bytes} onClick={() => window.print()}>
+          <Printer className="size-4" /> {t('toolkit.print')}
         </Button>
         <Button
           variant="ghost"
@@ -115,7 +127,7 @@ export default function App() {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <nav className="flex w-16 shrink-0 flex-col gap-1 border-r border-[var(--border)] bg-[var(--surface)] p-2">
+        <nav className="flex w-16 shrink-0 flex-col gap-1 border-r border-[var(--border)] bg-[var(--surface)] p-2 print:hidden">
           {navItems.map(({ id, icon: Icon, label }) => (
             <button
               key={id}
@@ -130,12 +142,12 @@ export default function App() {
           ))}
         </nav>
 
-        <aside className="hidden w-80 shrink-0 overflow-auto border-r border-[var(--border)] bg-[var(--bg)] lg:block">
+        <aside className="hidden w-80 shrink-0 overflow-auto border-r border-[var(--border)] bg-[var(--bg)] lg:block print:hidden">
           <SidebarContent />
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col">
-          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2">
+          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2 print:hidden">
             <Button
               variant={panel === 'annotate' ? 'primary' : 'outline'}
               onClick={() => dispatch({ type: 'SET_PANEL', panel: 'annotate' })}

@@ -51,6 +51,10 @@
     "ocr": "OCR หน้าปัจจุบัน",
     "formFiller": "กรอกฟอร์ม",
     "redact": "ปิดบังข้อมูล",
+    "encrypt": "เข้ารหัส PDF",
+    "decrypt": "ถอดรหัสผ่าน",
+    "password": "รหัสผ่าน",
+    "print": "พิมพ์",
     "mergeHint": "เลือกไฟล์ PDF หลายไฟล์เพื่อรวม",
     "watermarkText": "ข้อความลายน้ำ",
     "apply": "ใช้งาน"
