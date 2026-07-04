@@ -10,6 +10,7 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 
 ### Viewer
 - Open PDF (file picker or drag & drop)
+- **Multi-document tabs** — open several PDFs and switch between them
 - Zoom, pan, page navigation, thumbnail strip
 - Print current document
 - Light / dark / system theme
@@ -32,6 +33,8 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 - Compress, linearize, and optimize PDF (QPDF WASM)
 - Form field filler
 - Apply redaction marks
+- **Signature image** — place PNG/JPG signature on current page
+- **Word → PDF** and **HTML → PDF** conversion (mammoth + html2canvas)
 
 ### Annotate
 - Highlight, underline, strikeout, note, text, rectangle, redaction boxes
