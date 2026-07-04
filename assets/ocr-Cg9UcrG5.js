@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/src-BHyPwket.js","assets/rolldown-runtime-DAXXjFlN.js"])))=>i.map(i=>d[i]);
+import{o as e}from"./rolldown-runtime-DAXXjFlN.js";import{t}from"./index-B_Kh7cTn.js";async function n(n,r=`eng+tha`){let{createWorker:i}=await t(async()=>{let{createWorker:t}=await import(`./src-BHyPwket.js`).then(t=>e(t.default,1));return{createWorker:t}},__vite__mapDeps([0,1])),a=await i(r);try{return(await a.recognize(n)).data.text.trim()}finally{await a.terminate()}}export{n as runOcrFromCanvas};
