@@ -102,7 +102,7 @@ export function PdfViewer() {
   }, [bytes, currentPage, zoom, rotation, pdfPassword, viewerTool])
 
   useEffect(() => {
-    if (!pageWidth || !containerRef.current) return
+    if (fitWidthNonce === 0 || !pageWidth || !containerRef.current) return
     const available = containerRef.current.clientWidth - 48
     const fitZoom = Math.min(3, Math.max(0.4, available / pageWidth))
     dispatch({ type: 'SET_ZOOM', zoom: fitZoom })

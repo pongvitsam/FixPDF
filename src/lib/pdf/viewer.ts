@@ -1,5 +1,5 @@
 import * as pdfjsLib from 'pdfjs-dist'
-import type { PDFDocumentProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist'
 import type { SearchMatch } from '../../types'
 import { requestPassword } from './passwordPrompt'
 
@@ -7,6 +7,25 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
 ).toString()
+
+type CanvasRenderState = {
+  generation: number
+  task: RenderTask | null
+}
+
+const canvasRenderState = new WeakMap<HTMLCanvasElement, CanvasRenderState>()
+
+function beginCanvasRender(canvas: HTMLCanvasElement): number {
+  const prev = canvasRenderState.get(canvas)
+  const generation = (prev?.generation ?? 0) + 1
+  prev?.task?.cancel()
+  canvasRenderState.set(canvas, { generation, task: null })
+  return generation
+}
+
+function isCanvasRenderStale(canvas: HTMLCanvasElement, generation: number): boolean {
+  return canvasRenderState.get(canvas)?.generation !== generation
+}
 
 export type LoadedPdf = {
   pdf: PDFDocumentProxy
@@ -26,6 +45,7 @@ export async function loadPdfDocument(
       data: bytes.slice(),
       password: knownPassword,
       verbosity: pdfjsLib.VerbosityLevel.ERRORS,
+      enableXfa: false,
     })
 
     loadingTask.onPassword = (
@@ -62,14 +82,20 @@ export async function renderPageToCanvas(
   rotation = 0,
   options?: { signal?: AbortSignal },
 ) {
+  const generation = beginCanvasRender(canvas)
+
   const page = await pdf.getPage(pageIndex + 1)
-  if (options?.signal?.aborted) {
+  if (options?.signal?.aborted || isCanvasRenderStale(canvas, generation)) {
     throw new DOMException('Render aborted', 'AbortError')
   }
 
   const viewport = page.getViewport({ scale, rotation })
   const context = canvas.getContext('2d')
   if (!context) throw new Error('Canvas context unavailable')
+
+  if (isCanvasRenderStale(canvas, generation)) {
+    throw new DOMException('Render aborted', 'AbortError')
+  }
 
   canvas.width = viewport.width
   canvas.height = viewport.height
@@ -79,7 +105,13 @@ export async function renderPageToCanvas(
     viewport,
     canvas,
     annotationMode: pdfjsLib.AnnotationMode.DISABLE,
+    intent: 'display',
   })
+
+  const state = canvasRenderState.get(canvas)
+  if (state?.generation === generation) {
+    state.task = task
+  }
 
   if (options?.signal) {
     options.signal.addEventListener('abort', () => task.cancel(), { once: true })
@@ -92,6 +124,10 @@ export async function renderPageToCanvas(
       throw error
     }
     throw error
+  }
+
+  if (isCanvasRenderStale(canvas, generation)) {
+    throw new DOMException('Render aborted', 'AbortError')
   }
 
   return viewport
