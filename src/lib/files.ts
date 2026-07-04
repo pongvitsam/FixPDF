@@ -71,3 +71,9 @@ export function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
+
+export async function readDroppedPdfFiles(dataTransfer: DataTransfer): Promise<File[]> {
+  return [...dataTransfer.files].filter(
+    (file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+  )
+}

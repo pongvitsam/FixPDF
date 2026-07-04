@@ -27,7 +27,7 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 - Export page as PNG / JPG / WebP
 - View metadata
 - OCR current page (Tesseract.js, lazy-loaded)
-- Encrypt / decrypt PDF
+- Encrypt / decrypt PDF (re-export to remove password; pdf-lib cannot add encryption in-browser)
 - Form field filler
 - Apply redaction marks
 

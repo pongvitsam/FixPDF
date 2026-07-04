@@ -8,6 +8,9 @@
     "noDocument": "เปิดไฟล์ PDF เพื่อเริ่มใช้งาน",
     "processing": "กำลังประมวลผล…"
   },
+  "home": {
+    "dropHint": "ลากไฟล์ PDF มาวางที่นี่ หรือคลิกเปิด PDF"
+  },
   "nav": {
     "home": "หน้าแรก",
     "view": "มุมมอง",
@@ -47,6 +50,7 @@
     "crop": "ครอปขอบ",
     "exportPng": "ส่งออกเป็น PNG",
     "exportJpg": "ส่งออกเป็น JPG",
+    "exportWebp": "ส่งออกเป็น WebP",
     "metadata": "ดู metadata",
     "ocr": "OCR หน้าปัจจุบัน",
     "formFiller": "กรอกฟอร์ม",
@@ -55,6 +59,7 @@
     "decrypt": "ถอดรหัสผ่าน",
     "password": "รหัสผ่าน",
     "print": "พิมพ์",
+    "securityHint": "ถอดรหัสผ่านโดยส่งออก PDF ใหม่โดยไม่มีการเข้ารหัส",
     "mergeHint": "เลือกไฟล์ PDF หลายไฟล์เพื่อรวม",
     "watermarkText": "ข้อความลายน้ำ",
     "apply": "ใช้งาน"

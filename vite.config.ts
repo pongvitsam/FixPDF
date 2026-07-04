@@ -21,6 +21,10 @@ export default defineConfig({
         if (existsSync(index)) {
           copyFileSync(index, fallback)
         }
+        const nojekyll = resolve(__dirname, 'public/.nojekyll')
+        if (existsSync(nojekyll)) {
+          copyFileSync(nojekyll, resolve(outDir, '.nojekyll'))
+        }
       },
     },
   ],

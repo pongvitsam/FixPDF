@@ -60,6 +60,13 @@ button:not(:disabled) {
 @media print {
   body {
     background: white;
+    color: black;
+  }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
   }
 
   .print\:hidden {

@@ -35,7 +35,7 @@ export async function renderPageToImage(
   pdf: PDFDocumentProxy,
   pageIndex: number,
   scale: number,
-  mime: 'image/png' | 'image/jpeg',
+  mime: 'image/png' | 'image/jpeg' | 'image/webp',
 ) {
   const canvas = document.createElement('canvas')
   await renderPageToCanvas(pdf, pageIndex, scale, canvas)
@@ -43,7 +43,7 @@ export async function renderPageToImage(
     canvas.toBlob(
       (result) => (result ? resolve(result) : reject(new Error('Image export failed'))),
       mime,
-      mime === 'image/jpeg' ? 0.92 : undefined,
+      mime === 'image/jpeg' || mime === 'image/webp' ? 0.92 : undefined,
     )
   })
   return blob

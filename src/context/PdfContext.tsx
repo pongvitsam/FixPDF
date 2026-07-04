@@ -141,6 +141,7 @@ function reducer(state: State, action: Action): State {
 
 type PdfContextValue = State & {
   openDocument: () => Promise<void>
+  openFromFile: (file: File) => Promise<void>
   saveDocument: () => Promise<void>
   replaceBytes: (bytes: Uint8Array, fileName?: string) => Promise<void>
   commitAnnotations: () => Promise<void>
@@ -170,14 +171,21 @@ export function PdfProvider({ children }: { children: ReactNode }) {
     })
   }, [state.fileName])
 
+  const openFromFile = useCallback(
+    async (file: File) => {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      await replaceBytes(bytes, file.name)
+      dispatch({ type: 'SET_PANEL', panel: 'view' })
+    },
+    [replaceBytes],
+  )
+
   const openDocument = useCallback(async () => {
     const files = await openPdfFile(false)
     const file = files[0]
     if (!file) return
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    await replaceBytes(bytes, file.name)
-    dispatch({ type: 'SET_PANEL', panel: 'view' })
-  }, [replaceBytes])
+    await openFromFile(file)
+  }, [openFromFile])
 
   const saveDocument = useCallback(async () => {
     if (!state.bytes) return
@@ -213,12 +221,13 @@ export function PdfProvider({ children }: { children: ReactNode }) {
     () => ({
       ...state,
       openDocument,
+      openFromFile,
       saveDocument,
       replaceBytes,
       commitAnnotations,
       dispatch,
     }),
-    [state, openDocument, saveDocument, replaceBytes, commitAnnotations],
+    [state, openDocument, openFromFile, saveDocument, replaceBytes, commitAnnotations],
   )
 
   return <PdfContext.Provider value={value}>{children}</PdfContext.Provider>

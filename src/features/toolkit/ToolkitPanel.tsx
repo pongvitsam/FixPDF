@@ -181,6 +181,19 @@ export function ToolkitPanel() {
             onClick={() =>
               void run(async () => {
                 if (!bytes) return
+                const pdf = await loadPdfDocument(bytes)
+                const webp = await renderPageToImage(pdf, currentPage, 2, 'image/webp')
+                downloadBlob(webp, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.webp`)
+              })
+            }
+          >
+            <FileImage className="size-4" /> {t('toolkit.exportWebp')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
                 const meta = await readPdfMetadata(bytes)
                 setMetadataText(
                   [
@@ -232,9 +245,7 @@ export function ToolkitPanel() {
       ) : null}
 
       <Panel title={t('metadata.encrypted')}>
-        <p className="mb-3 text-xs text-[var(--muted)]">
-          Re-export the PDF without password protection. Full encryption requires desktop PDF tools.
-        </p>
+        <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.securityHint')}</p>
         <Button
           disabled={!bytes}
           onClick={() =>

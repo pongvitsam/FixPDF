@@ -6,7 +6,9 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import { FileUp } from 'lucide-react'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
+import { readDroppedPdfFiles } from '../../lib/files'
 import { loadPdfDocument, renderPageToCanvas } from '../../lib/pdf/viewer'
 import type { AnnotationKind } from '../../types'
 
@@ -32,6 +34,8 @@ export function PdfViewer() {
     annotations,
     draftAnnotation,
     viewerTool,
+    openDocument,
+    openFromFile,
   } = usePdf()
   const dispatch = usePdfDispatch()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -143,8 +147,29 @@ export function PdfViewer() {
 
   if (!bytes) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 text-[var(--muted)]">
-        <p>{t('app.noDocument')}</p>
+      <div
+        className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center text-[var(--muted)]"
+        onDragOver={(event) => {
+          event.preventDefault()
+          event.dataTransfer.dropEffect = 'copy'
+        }}
+        onDrop={(event) => {
+          event.preventDefault()
+          void (async () => {
+            const files = await readDroppedPdfFiles(event.dataTransfer)
+            if (files[0]) await openFromFile(files[0])
+          })()
+        }}
+      >
+        <FileUp className="size-12 text-[var(--primary)]" />
+        <p className="text-sm font-semibold text-[var(--text)]">{t('home.dropHint')}</p>
+        <button
+          type="button"
+          onClick={() => void openDocument()}
+          className="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+        >
+          {t('app.openPdf')}
+        </button>
       </div>
     )
   }
