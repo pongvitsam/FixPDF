@@ -77,7 +77,13 @@
     "imagesToPdf": "Images to PDF",
     "extractText": "Extract all text",
     "exportAllPng": "Export all pages PNG",
-    "editMetadata": "Edit metadata"
+    "editMetadata": "Edit metadata",
+    "wasmTitle": "QPDF engine (WASM)",
+    "wasmHint": "Native PDF processing — keeps vector quality for decrypt, compress, and optimize.",
+    "compress": "Compress PDF",
+    "linearize": "Linearize (fast web view)",
+    "optimize": "Optimize PDF",
+    "stripMetadata": "Strip metadata (QPDF)"
   },
   "annotate": {
     "title": "Annotations",
@@ -143,6 +149,8 @@
     "saved": "PDF saved",
     "merged": "PDFs merged",
     "split": "PDF split",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "compressed": "PDF compressed",
+    "optimized": "PDF optimized"
   }
 }

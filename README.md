@@ -28,7 +28,8 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 - View metadata
 - OCR current page (Tesseract.js, lazy-loaded)
 - Encrypt PDF with password (RC4 128-bit)
-- Decrypt / remove password protection
+- Decrypt / remove password protection (QPDF WASM — preserves vectors)
+- Compress, linearize, and optimize PDF (QPDF WASM)
 - Form field filler
 - Apply redaction marks
 
@@ -74,6 +75,7 @@ If the site still shows 404, Pages is almost always not set to **GitHub Actions*
 - PDF.js (rendering & search)
 - pdf-lib (merge, split, rotate, forms, annotations)
 - @pdfsmaller/pdf-encrypt-lite (password protection)
+- @neslinesli93/qpdf-wasm (native decrypt, compress, linearize, optimize)
 - Tesseract.js (optional OCR)
 - i18next (EN/TH)
 - Tailwind CSS v4

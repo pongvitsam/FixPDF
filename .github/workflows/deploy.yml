@@ -37,6 +37,7 @@ jobs:
           test -f dist/index.html
           test -f dist/404.html
           test -f dist/.nojekyll
+          test -f dist/qpdf.wasm
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

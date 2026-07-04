@@ -77,7 +77,13 @@
     "imagesToPdf": "รูปภาพเป็น PDF",
     "extractText": "ดึงข้อความทั้งหมด",
     "exportAllPng": "ส่งออกทุกหน้า PNG",
-    "editMetadata": "แก้ไข metadata"
+    "editMetadata": "แก้ไข metadata",
+    "wasmTitle": "QPDF engine (WASM)",
+    "wasmHint": "ประมวลผล PDF แบบ native — ถอดรหัส/บีบอัด/optimize คงคุณภาพ vector",
+    "compress": "บีบอัด PDF",
+    "linearize": "Linearize (โหลดเร็วบนเว็บ)",
+    "optimize": "Optimize PDF",
+    "stripMetadata": "ลบ metadata (QPDF)"
   },
   "annotate": {
     "title": "หมายเหตุ",
@@ -143,6 +149,8 @@
     "saved": "บันทึก PDF แล้ว",
     "merged": "รวม PDF แล้ว",
     "split": "แยก PDF แล้ว",
-    "error": "เกิดข้อผิดพลาด"
+    "error": "เกิดข้อผิดพลาด",
+    "compressed": "บีบอัด PDF แล้ว",
+    "optimized": "Optimize PDF แล้ว"
   }
 }

@@ -6,8 +6,11 @@ import {
   Hash,
   ImagePlus,
   Layers2,
+  Minimize2,
+  Rocket,
   Scissors,
   Trash2,
+  Zap,
 } from 'lucide-react'
 import { Button, Field, Input, Panel } from '../../components/ui'
 import { downloadBlob } from '../../lib/files'
@@ -15,12 +18,16 @@ import { showToast } from '../../components/Toast'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import {
   addPageNumbers,
+  compressPdf,
   extractAllText,
   flattenPdf,
   imagesToPdf,
+  linearizePdf,
+  optimizePdf,
   removePdfMetadata,
   splitPdfByInterval,
   editPdfMetadata,
+  stripMetadataQpdf,
 } from '../../lib/pdf/operations'
 import { loadPdfDocument, renderPageToImage } from '../../lib/pdf/viewer'
 
@@ -57,6 +64,62 @@ export function AdvancedToolkit() {
 
   return (
     <div className="space-y-3">
+      <Panel title={t('toolkit.wasmTitle')}>
+        <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.wasmHint')}</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const output = await compressPdf(bytes)
+                await replaceBytes(output)
+                showToast('toast.compressed')
+              })
+            }
+          >
+            <Minimize2 className="size-4" /> {t('toolkit.compress')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const output = await linearizePdf(bytes)
+                await replaceBytes(output)
+              })
+            }
+          >
+            <Rocket className="size-4" /> {t('toolkit.linearize')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const output = await optimizePdf(bytes)
+                await replaceBytes(output)
+                showToast('toast.optimized')
+              })
+            }
+          >
+            <Zap className="size-4" /> {t('toolkit.optimize')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const output = await stripMetadataQpdf(bytes)
+                await replaceBytes(output)
+              })
+            }
+          >
+            <Trash2 className="size-4" /> {t('toolkit.stripMetadata')}
+          </Button>
+        </div>
+      </Panel>
+
       <Panel title={t('toolkit.advanced')}>
         <div className="grid grid-cols-2 gap-2">
           <Button

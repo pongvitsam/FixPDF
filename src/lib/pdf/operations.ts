@@ -3,6 +3,10 @@ import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib'
 import type { Annotation, FormFieldInfo } from '../../types'
 import { renderPageToCanvas, loadPdfDocument } from './viewer'
 
+async function loadQpdfModule() {
+  return import('./qpdf')
+}
+
 export async function mergePdfFiles(files: Uint8Array[]): Promise<Uint8Array> {
   const merged = await PDFDocument.create()
   for (const bytes of files) {
@@ -259,13 +263,38 @@ export async function readPdfMetadata(bytes: Uint8Array) {
   }
 }
 
-export async function decryptPdf(bytes: Uint8Array) {
+export async function decryptPdf(bytes: Uint8Array, password?: string) {
   try {
-    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
-    return doc.save()
+    const { qpdfDecrypt } = await loadQpdfModule()
+    return await qpdfDecrypt(bytes, password)
   } catch {
-    return bytes
+    try {
+      const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+      return doc.save()
+    } catch {
+      return bytes
+    }
   }
+}
+
+export async function compressPdf(bytes: Uint8Array) {
+  const { qpdfCompress } = await loadQpdfModule()
+  return qpdfCompress(bytes)
+}
+
+export async function linearizePdf(bytes: Uint8Array) {
+  const { qpdfLinearize } = await loadQpdfModule()
+  return qpdfLinearize(bytes)
+}
+
+export async function optimizePdf(bytes: Uint8Array) {
+  const { qpdfOptimize } = await loadQpdfModule()
+  return qpdfOptimize(bytes)
+}
+
+export async function stripMetadataQpdf(bytes: Uint8Array) {
+  const { qpdfStripMetadata } = await loadQpdfModule()
+  return qpdfStripMetadata(bytes)
 }
 
 export async function encryptPdf(
@@ -278,28 +307,33 @@ export async function encryptPdf(
 }
 
 export async function unlockPasswordProtectedPdf(bytes: Uint8Array, password: string) {
-  const { pdf } = await loadPdfDocument(bytes, password)
-  const output = await PDFDocument.create()
+  try {
+    const { qpdfDecrypt } = await loadQpdfModule()
+    return await qpdfDecrypt(bytes, password)
+  } catch {
+    const { pdf } = await loadPdfDocument(bytes, password)
+    const output = await PDFDocument.create()
 
-  for (let pageIndex = 0; pageIndex < pdf.numPages; pageIndex += 1) {
-    const page = await pdf.getPage(pageIndex + 1)
-    const baseViewport = page.getViewport({ scale: 1 })
-    const canvas = document.createElement('canvas')
-    await renderPageToCanvas(pdf, pageIndex, 2, canvas)
-    const pngBytes = new Uint8Array(
-      await (await fetch(canvas.toDataURL('image/png'))).arrayBuffer(),
-    )
-    const image = await output.embedPng(pngBytes)
-    const pdfPage = output.addPage([baseViewport.width, baseViewport.height])
-    pdfPage.drawImage(image, {
-      x: 0,
-      y: 0,
-      width: baseViewport.width,
-      height: baseViewport.height,
-    })
+    for (let pageIndex = 0; pageIndex < pdf.numPages; pageIndex += 1) {
+      const page = await pdf.getPage(pageIndex + 1)
+      const baseViewport = page.getViewport({ scale: 1 })
+      const canvas = document.createElement('canvas')
+      await renderPageToCanvas(pdf, pageIndex, 2, canvas)
+      const pngBytes = new Uint8Array(
+        await (await fetch(canvas.toDataURL('image/png'))).arrayBuffer(),
+      )
+      const image = await output.embedPng(pngBytes)
+      const pdfPage = output.addPage([baseViewport.width, baseViewport.height])
+      pdfPage.drawImage(image, {
+        x: 0,
+        y: 0,
+        width: baseViewport.width,
+        height: baseViewport.height,
+      })
+    }
+
+    return output.save()
   }
-
-  return output.save()
 }
 
 export async function editPdfMetadata(

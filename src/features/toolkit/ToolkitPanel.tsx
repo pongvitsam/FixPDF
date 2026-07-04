@@ -319,6 +319,8 @@ export function ToolkitPanel() {
                 let output: Uint8Array
                 if (metadata?.encrypted && pdfPassword) {
                   output = await unlockPasswordProtectedPdf(bytes, pdfPassword)
+                } else if (metadata?.encrypted) {
+                  output = await decryptPdf(bytes, pdfPassword ?? undefined)
                 } else {
                   output = await decryptPdf(bytes)
                 }
