@@ -66,15 +66,17 @@ npm run preview
 
 ## GitHub Pages setup (one-time)
 
-The workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds `dist/` and publishes with `upload-pages-artifact` + `deploy-pages` (GitHub Actions — not the legacy `gh-pages` branch).
+The workflow builds `dist/` and publishes it two ways: **GitHub Actions** (`deploy-pages`) and the **`gh-pages` branch**. Pick **one** source in repository settings — if Pages still serves `main`, you will see 404 errors for `main.tsx` and `favicon.svg`.
 
 1. Open [FixPDF Settings → Pages](https://github.com/pongvitsam/FixPDF/settings/pages)
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**
-3. Push to `main` (or run the workflow manually from the **Actions** tab)
-4. On first deploy, approve the **`github-pages`** environment if GitHub prompts you
-5. The site will be live at https://pongvitsam.github.io/FixPDF/ within 1–2 minutes
+2. Under **Build and deployment**, choose **either**:
+   - **GitHub Actions** (recommended) — uses `upload-pages-artifact` + `deploy-pages`
+   - **Deploy from a branch** → branch **`gh-pages`** → folder **`/ (root)`**
+3. Push to `main` (or run **Deploy GitHub Pages** manually from the Actions tab)
+4. If using GitHub Actions, approve the **`github-pages`** environment when prompted
+5. Live site: https://pongvitsam.github.io/FixPDF/ (allow 1–2 minutes after deploy)
 
-If the site still shows 404, Pages is almost always not set to **GitHub Actions** yet. Check the latest **Deploy GitHub Pages** run in the Actions tab for errors.
+**Verify:** View page source — you should see `/FixPDF/assets/index-*.js`, not `/src/main.tsx`.
 
 ## Tech stack
 
@@ -85,6 +87,7 @@ If the site still shows 404, Pages is almost always not set to **GitHub Actions*
 - @neslinesli93/qpdf-wasm (native decrypt, compress, linearize, optimize)
 - clawpdf / PDFium WASM (text extraction, high-quality render)
 - Tesseract.js (optional OCR)
+- mammoth + html2canvas (Word/HTML → PDF)
 - i18next (EN/TH)
 - Tailwind CSS v4
 
