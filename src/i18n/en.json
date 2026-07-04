@@ -8,6 +8,9 @@
     "noDocument": "Open a PDF to get started",
     "processing": "Processing…"
   },
+  "common": {
+    "cancel": "Cancel"
+  },
   "home": {
     "dropHint": "Drag & drop a PDF here, or click Open PDF"
   },
@@ -51,6 +54,8 @@
     "exportPng": "Export page as PNG",
     "exportJpg": "Export page as JPG",
     "exportWebp": "Export page as WebP",
+    "exportBmp": "Export page as BMP",
+    "exportTiff": "Export page as TIFF",
     "metadata": "View metadata",
     "ocr": "OCR current page",
     "formFiller": "Form filler",
@@ -59,7 +64,7 @@
     "decrypt": "Remove password",
     "password": "Password",
     "print": "Print",
-    "securityHint": "Remove password protection by re-exporting the PDF without encryption.",
+    "securityHint": "Encrypt with a password, or remove protection by re-exporting without encryption.",
     "mergeHint": "Select multiple PDF files to merge",
     "watermarkText": "Watermark text",
     "apply": "Apply"
@@ -100,6 +105,14 @@
     "fieldName": "Field name",
     "value": "Value",
     "fill": "Fill field"
+  },
+  "security": {
+    "passwordRequired": "Password required",
+    "enterPassword": "This PDF is protected. Enter the password to open it.",
+    "incorrectPassword": "Incorrect password. Try again.",
+    "unlock": "Unlock",
+    "ownerPassword": "Owner password",
+    "ownerOptional": "Optional — defaults to user password"
   },
   "ocr": {
     "running": "Running OCR…",

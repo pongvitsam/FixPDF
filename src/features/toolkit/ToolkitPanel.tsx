@@ -6,6 +6,7 @@ import {
   FileText,
   GitMerge,
   Layers3,
+  Lock,
   LockOpen,
   RotateCw,
   ScanText,
@@ -15,28 +16,33 @@ import {
 } from 'lucide-react'
 import { Button, Field, Input, Panel } from '../../components/ui'
 import { downloadBlob, formatBytes, openPdfFile } from '../../lib/files'
+import { canvasToBmpBlob, canvasToTiffBlob } from '../../lib/pdf/imageExport'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import {
   addWatermark,
   cropMargins,
   decryptPdf,
+  encryptPdf,
   extractPageRange,
   mergePdfFiles,
   readPdfMetadata,
   rotateAllPages,
   splitPdfAllPages,
+  unlockPasswordProtectedPdf,
 } from '../../lib/pdf/operations'
-import { loadPdfDocument, renderPageToImage } from '../../lib/pdf/viewer'
+import { loadPdfDocument, renderPageToCanvas, renderPageToImage } from '../../lib/pdf/viewer'
 
 export function ToolkitPanel() {
   const { t } = useTranslation()
-  const { bytes, currentPage, fileName, replaceBytes } = usePdf()
+  const { bytes, currentPage, fileName, metadata, pdfPassword, replaceBytes } = usePdf()
   const dispatch = usePdfDispatch()
   const [watermark, setWatermark] = useState('FixPDF')
   const [rangeStart, setRangeStart] = useState('1')
   const [rangeEnd, setRangeEnd] = useState('1')
   const [metadataText, setMetadataText] = useState('')
   const [ocrText, setOcrText] = useState('')
+  const [encryptPassword, setEncryptPassword] = useState('')
+  const [ownerPassword, setOwnerPassword] = useState('')
 
   const run = async (task: () => Promise<void>) => {
     dispatch({ type: 'SET_BUSY', busy: true, message: t('app.processing') })
@@ -155,7 +161,7 @@ export function ToolkitPanel() {
             onClick={() =>
               void run(async () => {
                 if (!bytes) return
-                const pdf = await loadPdfDocument(bytes)
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
                 const png = await renderPageToImage(pdf, currentPage, 2, 'image/png')
                 downloadBlob(png, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.png`)
               })
@@ -168,7 +174,7 @@ export function ToolkitPanel() {
             onClick={() =>
               void run(async () => {
                 if (!bytes) return
-                const pdf = await loadPdfDocument(bytes)
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
                 const jpg = await renderPageToImage(pdf, currentPage, 2, 'image/jpeg')
                 downloadBlob(jpg, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.jpg`)
               })
@@ -181,13 +187,43 @@ export function ToolkitPanel() {
             onClick={() =>
               void run(async () => {
                 if (!bytes) return
-                const pdf = await loadPdfDocument(bytes)
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
                 const webp = await renderPageToImage(pdf, currentPage, 2, 'image/webp')
                 downloadBlob(webp, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.webp`)
               })
             }
           >
             <FileImage className="size-4" /> {t('toolkit.exportWebp')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
+                const canvas = document.createElement('canvas')
+                await renderPageToCanvas(pdf, currentPage, 2, canvas)
+                const bmp = await canvasToBmpBlob(canvas)
+                downloadBlob(bmp, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.bmp`)
+              })
+            }
+          >
+            <FileImage className="size-4" /> {t('toolkit.exportBmp')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
+                const canvas = document.createElement('canvas')
+                await renderPageToCanvas(pdf, currentPage, 2, canvas)
+                const tiff = await canvasToTiffBlob(canvas)
+                downloadBlob(tiff, `${fileName.replace(/\.pdf$/i, '')}-p${currentPage + 1}.tiff`)
+              })
+            }
+          >
+            <FileImage className="size-4" /> {t('toolkit.exportTiff')}
           </Button>
           <Button
             disabled={!bytes}
@@ -216,9 +252,8 @@ export function ToolkitPanel() {
             onClick={() =>
               void run(async () => {
                 if (!bytes) return
-                const pdf = await loadPdfDocument(bytes)
+                const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
                 const canvas = document.createElement('canvas')
-                const { renderPageToCanvas } = await import('../../lib/pdf/viewer')
                 await renderPageToCanvas(pdf, currentPage, 2, canvas)
                 const { runOcrFromCanvas } = await import('../../lib/pdf/ocr')
                 const text = await runOcrFromCanvas(canvas)
@@ -246,18 +281,54 @@ export function ToolkitPanel() {
 
       <Panel title={t('metadata.encrypted')}>
         <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.securityHint')}</p>
-        <Button
-          disabled={!bytes}
-          onClick={() =>
-            void run(async () => {
-              if (!bytes) return
-              const output = await decryptPdf(bytes)
-              await replaceBytes(output)
-            })
-          }
-        >
-          <LockOpen className="size-4" /> {t('toolkit.decrypt')}
-        </Button>
+        <div className="mb-3 grid grid-cols-1 gap-2">
+          <Field label={t('toolkit.password')}>
+            <Input
+              type="password"
+              value={encryptPassword}
+              onChange={(event) => setEncryptPassword(event.target.value)}
+            />
+          </Field>
+          <Field label={t('security.ownerPassword')}>
+            <Input
+              type="password"
+              value={ownerPassword}
+              onChange={(event) => setOwnerPassword(event.target.value)}
+              placeholder={t('security.ownerOptional')}
+            />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            disabled={!bytes || !encryptPassword}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes || !encryptPassword) return
+                const output = await encryptPdf(bytes, encryptPassword, ownerPassword || undefined)
+                await replaceBytes(output, undefined, encryptPassword)
+              })
+            }
+          >
+            <Lock className="size-4" /> {t('toolkit.encrypt')}
+          </Button>
+          <Button
+            disabled={!bytes}
+            onClick={() =>
+              void run(async () => {
+                if (!bytes) return
+                let output: Uint8Array
+                if (metadata?.encrypted && pdfPassword) {
+                  output = await unlockPasswordProtectedPdf(bytes, pdfPassword)
+                } else {
+                  output = await decryptPdf(bytes)
+                }
+                await replaceBytes(output, undefined, null)
+              })
+            }
+          >
+            <LockOpen className="size-4" /> {t('toolkit.decrypt')}
+          </Button>
+        </div>
       </Panel>
 
       <FormFillerSection />

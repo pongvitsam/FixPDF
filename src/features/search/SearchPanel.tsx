@@ -6,7 +6,7 @@ import { loadPdfDocument, searchPdfText } from '../../lib/pdf/viewer'
 
 export function SearchPanel() {
   const { t } = useTranslation()
-  const { bytes, searchQuery, searchMatches, matchCase } = usePdf()
+  const { bytes, searchQuery, searchMatches, matchCase, pdfPassword } = usePdf()
   const dispatch = usePdfDispatch()
 
   const runSearch = async () => {
@@ -16,7 +16,7 @@ export function SearchPanel() {
     }
     dispatch({ type: 'SET_BUSY', busy: true })
     try {
-      const pdf = await loadPdfDocument(bytes)
+      const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
       const matches = await searchPdfText(pdf, searchQuery.trim(), matchCase)
       dispatch({ type: 'SET_SEARCH', query: searchQuery, matches })
     } finally {

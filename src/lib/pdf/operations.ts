@@ -1,5 +1,7 @@
+import { encryptPDF } from '@pdfsmaller/pdf-encrypt-lite'
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib'
 import type { Annotation, FormFieldInfo } from '../../types'
+import { renderPageToCanvas, loadPdfDocument } from './viewer'
 
 export async function mergePdfFiles(files: Uint8Array[]): Promise<Uint8Array> {
   const merged = await PDFDocument.create()
@@ -217,6 +219,44 @@ export async function readPdfMetadata(bytes: Uint8Array) {
 }
 
 export async function decryptPdf(bytes: Uint8Array) {
-  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
-  return doc.save()
+  try {
+    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+    return doc.save()
+  } catch {
+    return bytes
+  }
+}
+
+export async function encryptPdf(
+  bytes: Uint8Array,
+  userPassword: string,
+  ownerPassword?: string,
+) {
+  const plain = await decryptPdf(bytes)
+  return encryptPDF(plain, userPassword, ownerPassword ?? userPassword)
+}
+
+export async function unlockPasswordProtectedPdf(bytes: Uint8Array, password: string) {
+  const { pdf } = await loadPdfDocument(bytes, password)
+  const output = await PDFDocument.create()
+
+  for (let pageIndex = 0; pageIndex < pdf.numPages; pageIndex += 1) {
+    const page = await pdf.getPage(pageIndex + 1)
+    const baseViewport = page.getViewport({ scale: 1 })
+    const canvas = document.createElement('canvas')
+    await renderPageToCanvas(pdf, pageIndex, 2, canvas)
+    const pngBytes = new Uint8Array(
+      await (await fetch(canvas.toDataURL('image/png'))).arrayBuffer(),
+    )
+    const image = await output.embedPng(pngBytes)
+    const pdfPage = output.addPage([baseViewport.width, baseViewport.height])
+    pdfPage.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: baseViewport.width,
+      height: baseViewport.height,
+    })
+  }
+
+  return output.save()
 }

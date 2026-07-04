@@ -1,15 +1,56 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { SearchMatch } from '../../types'
+import { requestPassword } from './passwordPrompt'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
 ).toString()
 
-export async function loadPdfDocument(bytes: Uint8Array): Promise<PDFDocumentProxy> {
-  const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() })
-  return loadingTask.promise
+export type LoadedPdf = {
+  pdf: PDFDocumentProxy
+  password?: string
+  encrypted: boolean
+}
+
+export async function loadPdfDocument(
+  bytes: Uint8Array,
+  knownPassword?: string,
+): Promise<LoadedPdf> {
+  let usedPassword = knownPassword
+  let encrypted = false
+
+  const pdf = await new Promise<PDFDocumentProxy>((resolve, reject) => {
+    const loadingTask = pdfjsLib.getDocument({
+      data: bytes.slice(),
+      password: knownPassword,
+    })
+
+    loadingTask.onPassword = (
+      updatePassword: (password: string) => void,
+      reason: number,
+    ) => {
+      encrypted = true
+      if (knownPassword) {
+        updatePassword(knownPassword)
+        return
+      }
+      void requestPassword(reason).then((password) => {
+        if (!password) {
+          loadingTask.destroy()
+          reject(new Error('Password required'))
+          return
+        }
+        usedPassword = password
+        updatePassword(password)
+      })
+    }
+
+    loadingTask.promise.then(resolve).catch(reject)
+  })
+
+  return { pdf, password: usedPassword, encrypted }
 }
 
 export async function renderPageToCanvas(

@@ -7,6 +7,7 @@ import {
   useReducer,
   type ReactNode,
 } from 'react'
+import { PasswordDialog } from '../components/PasswordDialog'
 import type {
   Annotation,
   AnnotationKind,
@@ -41,10 +42,11 @@ type State = {
   theme: ThemeMode
   pageOrder: number[]
   ocrText: string | null
+  pdfPassword: string | null
 }
 
 type Action =
-  | { type: 'SET_BYTES'; bytes: Uint8Array; fileName: string }
+  | { type: 'SET_BYTES'; bytes: Uint8Array; fileName: string; pdfPassword?: string | null; encrypted?: boolean }
   | { type: 'SET_PAGE'; page: number }
   | { type: 'SET_ZOOM'; zoom: number }
   | { type: 'SET_ROTATION'; rotation: number }
@@ -84,6 +86,7 @@ const initialState: State = {
   theme: (localStorage.getItem('fixpdf-theme') as ThemeMode | null) ?? 'system',
   pageOrder: [],
   ocrText: null,
+  pdfPassword: null,
 }
 
 function reducer(state: State, action: Action): State {
@@ -99,6 +102,7 @@ function reducer(state: State, action: Action): State {
         searchQuery: '',
         searchMatches: [],
         ocrText: null,
+        pdfPassword: action.pdfPassword ?? null,
       }
     case 'SET_PAGE':
       return { ...state, currentPage: action.page }
@@ -143,7 +147,7 @@ type PdfContextValue = State & {
   openDocument: () => Promise<void>
   openFromFile: (file: File) => Promise<void>
   saveDocument: () => Promise<void>
-  replaceBytes: (bytes: Uint8Array, fileName?: string) => Promise<void>
+  replaceBytes: (bytes: Uint8Array, fileName?: string, pdfPassword?: string | null) => Promise<void>
   commitAnnotations: () => Promise<void>
   dispatch: (action: Action) => void
 }
@@ -153,31 +157,65 @@ const PdfContext = createContext<PdfContextValue | null>(null)
 export function PdfProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const replaceBytes = useCallback(async (bytes: Uint8Array, fileName?: string) => {
-    dispatch({ type: 'SET_BYTES', bytes, fileName: fileName ?? state.fileName })
-    const pdf = await loadPdfDocument(bytes)
+  const replaceBytes = useCallback(async (
+    bytes: Uint8Array,
+    fileName?: string,
+    passwordOverride?: string | null,
+  ) => {
+    const password =
+      passwordOverride === undefined
+        ? state.pdfPassword ?? undefined
+        : passwordOverride ?? undefined
+    const loaded = await loadPdfDocument(bytes, password)
+    dispatch({
+      type: 'SET_BYTES',
+      bytes,
+      fileName: fileName ?? state.fileName,
+      pdfPassword: passwordOverride === undefined
+        ? loaded.password ?? state.pdfPassword
+        : passwordOverride,
+    })
     dispatch({
       type: 'SET_METADATA',
       metadata: {
-        pageCount: pdf.numPages,
+        pageCount: loaded.pdf.numPages,
         fileSize: bytes.byteLength,
-        encrypted: false,
+        encrypted: loaded.encrypted,
       },
     })
     dispatch({
       type: 'SET_PAGE_ORDER',
-      order: Array.from({ length: pdf.numPages }, (_, index) => index),
-      pageCount: pdf.numPages,
+      order: Array.from({ length: loaded.pdf.numPages }, (_, index) => index),
+      pageCount: loaded.pdf.numPages,
     })
-  }, [state.fileName])
+  }, [state.fileName, state.pdfPassword])
 
   const openFromFile = useCallback(
     async (file: File) => {
       const bytes = new Uint8Array(await file.arrayBuffer())
-      await replaceBytes(bytes, file.name)
+      const loaded = await loadPdfDocument(bytes)
+      dispatch({
+        type: 'SET_BYTES',
+        bytes,
+        fileName: file.name,
+        pdfPassword: loaded.password ?? null,
+      })
+      dispatch({
+        type: 'SET_METADATA',
+        metadata: {
+          pageCount: loaded.pdf.numPages,
+          fileSize: bytes.byteLength,
+          encrypted: loaded.encrypted,
+        },
+      })
+      dispatch({
+        type: 'SET_PAGE_ORDER',
+        order: Array.from({ length: loaded.pdf.numPages }, (_, index) => index),
+        pageCount: loaded.pdf.numPages,
+      })
       dispatch({ type: 'SET_PANEL', panel: 'view' })
     },
-    [replaceBytes],
+    [],
   )
 
   const openDocument = useCallback(async () => {
@@ -230,7 +268,12 @@ export function PdfProvider({ children }: { children: ReactNode }) {
     [state, openDocument, openFromFile, saveDocument, replaceBytes, commitAnnotations],
   )
 
-  return <PdfContext.Provider value={value}>{children}</PdfContext.Provider>
+  return (
+    <PdfContext.Provider value={value}>
+      {children}
+      <PasswordDialog />
+    </PdfContext.Provider>
+  )
 }
 
 export function usePdf() {

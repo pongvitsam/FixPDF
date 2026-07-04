@@ -2,7 +2,7 @@
 
 [![Deploy GitHub Pages](https://github.com/pongvitsam/FixPDF/actions/workflows/deploy.yml/badge.svg)](https://github.com/pongvitsam/FixPDF/actions/workflows/deploy.yml)
 
-Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt, search, and export PDFs entirely in the browser.
+Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt, decrypt, search, and export PDFs entirely in the browser.
 
 **Live demo:** https://pongvitsam.github.io/FixPDF/
 
@@ -24,10 +24,11 @@ Fast, lightweight web PDF editor. View, annotate, merge, split, rotate, encrypt,
 - Split into single pages or extract page ranges
 - Rotate all pages
 - Watermark, crop margins
-- Export page as PNG / JPG / WebP
+- Export page as PNG / JPG / WebP / BMP / TIFF
 - View metadata
 - OCR current page (Tesseract.js, lazy-loaded)
-- Encrypt / decrypt PDF (re-export to remove password; pdf-lib cannot add encryption in-browser)
+- Encrypt PDF with password (RC4 128-bit)
+- Decrypt / remove password protection
 - Form field filler
 - Apply redaction marks
 
@@ -71,7 +72,8 @@ If the site still shows 404, Pages is almost always not set to **GitHub Actions*
 
 - Vite + React + TypeScript
 - PDF.js (rendering & search)
-- pdf-lib (merge, split, rotate, forms, annotations, encryption)
+- pdf-lib (merge, split, rotate, forms, annotations)
+- @pdfsmaller/pdf-encrypt-lite (password protection)
 - Tesseract.js (optional OCR)
 - i18next (EN/TH)
 - Tailwind CSS v4

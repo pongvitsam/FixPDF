@@ -34,6 +34,7 @@ export function PdfViewer() {
     annotations,
     draftAnnotation,
     viewerTool,
+    pdfPassword,
     openDocument,
     openFromFile,
   } = usePdf()
@@ -49,7 +50,7 @@ export function PdfViewer() {
     let cancelled = false
 
     void (async () => {
-      const pdf = await loadPdfDocument(bytes)
+      const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
       if (cancelled) return
       const vp = await renderPageToCanvas(
         pdf,
@@ -64,7 +65,7 @@ export function PdfViewer() {
     return () => {
       cancelled = true
     }
-  }, [bytes, currentPage, zoom, rotation])
+  }, [bytes, currentPage, zoom, rotation, pdfPassword])
 
   const onMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (!bytes) return
@@ -225,7 +226,7 @@ export function PdfViewer() {
 }
 
 export function ThumbnailStrip() {
-  const { bytes, currentPage, pageCount } = usePdf()
+  const { bytes, currentPage, pageCount, pdfPassword } = usePdf()
   const dispatch = usePdfDispatch()
   const [thumbs, setThumbs] = useState<string[]>([])
 
@@ -237,7 +238,7 @@ export function ThumbnailStrip() {
 
     let cancelled = false
     void (async () => {
-      const pdf = await loadPdfDocument(bytes)
+      const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
       const images: string[] = []
       for (let index = 0; index < pdf.numPages; index += 1) {
         const canvas = document.createElement('canvas')
@@ -250,7 +251,7 @@ export function ThumbnailStrip() {
     return () => {
       cancelled = true
     }
-  }, [bytes])
+  }, [bytes, pdfPassword])
 
   if (!bytes) return null
 
