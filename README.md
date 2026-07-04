@@ -57,7 +57,7 @@ npm run preview
 
 ## GitHub Pages setup (one-time)
 
-The workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds `dist/` and publishes via **GitHub Actions** (not the `gh-pages` branch).
+The workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds `dist/` and publishes with `upload-pages-artifact` + `deploy-pages` (GitHub Actions — not the legacy `gh-pages` branch).
 
 1. Open [FixPDF Settings → Pages](https://github.com/pongvitsam/FixPDF/settings/pages)
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**
