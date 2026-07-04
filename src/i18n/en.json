@@ -1,0 +1,105 @@
+{
+  "app": {
+    "title": "FixPDF",
+    "subtitle": "Fast & modern web PDF editor",
+    "openPdf": "Open PDF",
+    "save": "Save",
+    "saveAs": "Save As",
+    "noDocument": "Open a PDF to get started",
+    "processing": "Processing…"
+  },
+  "nav": {
+    "home": "Home",
+    "view": "View",
+    "pages": "Pages",
+    "toolkit": "Toolkit",
+    "annotate": "Annotate",
+    "search": "Search",
+    "settings": "Settings"
+  },
+  "viewer": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fitWidth": "Fit width",
+    "page": "Page",
+    "of": "of",
+    "pan": "Pan",
+    "select": "Select"
+  },
+  "pages": {
+    "title": "Page management",
+    "rotateLeft": "Rotate left",
+    "rotateRight": "Rotate right",
+    "delete": "Delete page",
+    "duplicate": "Duplicate",
+    "addBlank": "Add blank page",
+    "reverse": "Reverse order",
+    "reorderHint": "Drag thumbnails to reorder pages"
+  },
+  "toolkit": {
+    "title": "Toolkit",
+    "merge": "Merge PDFs",
+    "split": "Split PDF",
+    "splitAll": "Split into single pages",
+    "splitRange": "Extract page range",
+    "rotate": "Rotate all pages",
+    "watermark": "Add watermark",
+    "crop": "Crop margins",
+    "exportPng": "Export page as PNG",
+    "exportJpg": "Export page as JPG",
+    "metadata": "View metadata",
+    "ocr": "OCR current page",
+    "formFiller": "Form filler",
+    "redact": "Apply redaction",
+    "mergeHint": "Select multiple PDF files to merge",
+    "watermarkText": "Watermark text",
+    "apply": "Apply"
+  },
+  "annotate": {
+    "title": "Annotations",
+    "highlight": "Highlight",
+    "underline": "Underline",
+    "strikeout": "Strikeout",
+    "note": "Note",
+    "text": "Text",
+    "rectangle": "Rectangle",
+    "clearAll": "Clear all"
+  },
+  "search": {
+    "title": "Search text",
+    "placeholder": "Search in document…",
+    "matchCase": "Match case",
+    "noMatches": "No matches found",
+    "results": "{{count}} matches"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "metadata": {
+    "title": "Document metadata",
+    "pages": "Pages",
+    "size": "File size",
+    "encrypted": "Encrypted"
+  },
+  "form": {
+    "title": "Form fields",
+    "fieldName": "Field name",
+    "value": "Value",
+    "fill": "Fill field"
+  },
+  "ocr": {
+    "running": "Running OCR…",
+    "result": "OCR result"
+  },
+  "toast": {
+    "saved": "PDF saved",
+    "merged": "PDFs merged",
+    "split": "PDF split",
+    "error": "Something went wrong"
+  }
+}

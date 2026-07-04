@@ -1,0 +1,105 @@
+{
+  "app": {
+    "title": "FixPDF",
+    "subtitle": "ตัวแก้ไข PDF บนเว็บที่ทันสมัย",
+    "openPdf": "เปิด PDF",
+    "save": "บันทึก",
+    "saveAs": "บันทึกเป็น",
+    "noDocument": "เปิดไฟล์ PDF เพื่อเริ่มใช้งาน",
+    "processing": "กำลังประมวลผล…"
+  },
+  "nav": {
+    "home": "หน้าแรก",
+    "view": "มุมมอง",
+    "pages": "หน้า",
+    "toolkit": "เครื่องมือ",
+    "annotate": "ใส่หมายเหตุ",
+    "search": "ค้นหา",
+    "settings": "ตั้งค่า"
+  },
+  "viewer": {
+    "zoomIn": "ซูมเข้า",
+    "zoomOut": "ซูมออก",
+    "fitWidth": "พอดีความกว้าง",
+    "page": "หน้า",
+    "of": "จาก",
+    "pan": "เลื่อน",
+    "select": "เลือก"
+  },
+  "pages": {
+    "title": "จัดการหน้า",
+    "rotateLeft": "หมุนซ้าย",
+    "rotateRight": "หมุนขวา",
+    "delete": "ลบหน้า",
+    "duplicate": "ทำซ้ำ",
+    "addBlank": "เพิ่มหน้าว่าง",
+    "reverse": "กลับลำดับ",
+    "reorderHint": "ลากรูปย่อเพื่อจัดลำดับหน้า"
+  },
+  "toolkit": {
+    "title": "เครื่องมือ",
+    "merge": "รวม PDF",
+    "split": "แยก PDF",
+    "splitAll": "แยกทีละหน้า",
+    "splitRange": "ดึงช่วงหน้า",
+    "rotate": "หมุนทุกหน้า",
+    "watermark": "ใส่ลายน้ำ",
+    "crop": "ครอปขอบ",
+    "exportPng": "ส่งออกเป็น PNG",
+    "exportJpg": "ส่งออกเป็น JPG",
+    "metadata": "ดู metadata",
+    "ocr": "OCR หน้าปัจจุบัน",
+    "formFiller": "กรอกฟอร์ม",
+    "redact": "ปิดบังข้อมูล",
+    "mergeHint": "เลือกไฟล์ PDF หลายไฟล์เพื่อรวม",
+    "watermarkText": "ข้อความลายน้ำ",
+    "apply": "ใช้งาน"
+  },
+  "annotate": {
+    "title": "หมายเหตุ",
+    "highlight": "ไฮไลต์",
+    "underline": "ขีดเส้นใต้",
+    "strikeout": "ขีดฆ่า",
+    "note": "โน้ต",
+    "text": "ข้อความ",
+    "rectangle": "สี่เหลี่ยม",
+    "clearAll": "ลบทั้งหมด"
+  },
+  "search": {
+    "title": "ค้นหาข้อความ",
+    "placeholder": "ค้นหาในเอกสาร…",
+    "matchCase": "ตรงตัวพิมพ์",
+    "noMatches": "ไม่พบข้อความ",
+    "results": "พบ {{count}} รายการ"
+  },
+  "settings": {
+    "title": "ตั้งค่า",
+    "language": "ภาษา",
+    "theme": "ธีม",
+    "light": "สว่าง",
+    "dark": "มืด",
+    "system": "ตามระบบ"
+  },
+  "metadata": {
+    "title": "ข้อมูลเอกสาร",
+    "pages": "จำนวนหน้า",
+    "size": "ขนาดไฟล์",
+    "encrypted": "เข้ารหัส"
+  },
+  "form": {
+    "title": "ฟิลด์ฟอร์ม",
+    "fieldName": "ชื่อฟิลด์",
+    "value": "ค่า",
+    "fill": "กรอกฟิลด์"
+  },
+  "ocr": {
+    "running": "กำลัง OCR…",
+    "result": "ผลลัพธ์ OCR"
+  },
+  "toast": {
+    "saved": "บันทึก PDF แล้ว",
+    "merged": "รวม PDF แล้ว",
+    "split": "แยก PDF แล้ว",
+    "error": "เกิดข้อผิดพลาด"
+  }
+}

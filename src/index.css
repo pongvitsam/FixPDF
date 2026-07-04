@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --bg: oklch(0.97 0.004 106);
+  --surface: oklch(0.99 0.003 106);
+  --border: oklch(0.87 0.006 107);
+  --text: oklch(0.27 0.004 107);
+  --muted: oklch(0.52 0.01 99);
+  --primary: oklch(0.64 0.165 338);
+  --primary-fg: white;
+  --accent: oklch(0.93 0.012 95);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: oklch(0.27 0.004 107);
+  --surface: oklch(0.29 0.002 106);
+  --border: oklch(0.36 0.01 107);
+  --text: oklch(0.96 0.003 106);
+  --muted: oklch(0.77 0.017 99);
+  --primary: oklch(0.76 0.185 338);
+  --primary-fg: white;
+  --accent: oklch(0.21 0.008 95);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Prompt', ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted) 40%, transparent);
+  border-radius: 999px;
+}
