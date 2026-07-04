@@ -13,13 +13,16 @@ import {
   Shield,
   Split,
   Stamp,
+  PenLine,
 } from 'lucide-react'
 import { Button, Field, Input, Panel } from '../../components/ui'
 import { downloadBlob, formatBytes, openPdfFile } from '../../lib/files'
+import { showToast } from '../../components/Toast'
 import { canvasToBmpBlob, canvasToTiffBlob } from '../../lib/pdf/imageExport'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import {
   addWatermark,
+  addSignatureImage,
   cropMargins,
   decryptPdf,
   encryptPdf,
@@ -265,6 +268,31 @@ export function ToolkitPanel() {
             <ScanText className="size-4" /> {t('toolkit.ocr')}
           </Button>
         </div>
+      </Panel>
+
+      <Panel title={t('toolkit.signatureTitle')}>
+        <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.signatureHint')}</p>
+        <Button
+          disabled={!bytes}
+          onClick={() =>
+            void run(async () => {
+              if (!bytes) return
+              const input = document.createElement('input')
+              input.type = 'file'
+              input.accept = 'image/png,image/jpeg,.png,.jpg,.jpeg'
+              const file = await new Promise<File | null>((resolve) => {
+                input.onchange = () => resolve(input.files?.[0] ?? null)
+                input.click()
+              })
+              if (!file) return
+              const output = await addSignatureImage(bytes, currentPage, file)
+              await replaceBytes(output)
+              showToast('toast.signatureAdded')
+            })
+          }
+        >
+          <PenLine className="size-4" /> {t('toolkit.addSignature')}
+        </Button>
       </Panel>
 
       {metadataText ? (

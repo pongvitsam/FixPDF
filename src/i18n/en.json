@@ -92,7 +92,17 @@
     "pdfiumTitle": "PDFium engine (WASM)",
     "pdfiumHint": "High-quality text extraction and page rendering via Google PDFium.",
     "pdfiumExtract": "Extract text (PDFium)",
-    "pdfiumRender": "Render page PNG (PDFium)"
+    "pdfiumRender": "Render page PNG (PDFium)",
+    "signatureTitle": "Signature image",
+    "signatureHint": "Place a PNG/JPG signature on the current page (bottom-right).",
+    "addSignature": "Add signature",
+    "convertTitle": "Convert to PDF",
+    "convertHint": "Convert Word (.docx) or HTML files into PDF in your browser.",
+    "wordToPdf": "Word → PDF",
+    "htmlToPdf": "HTML → PDF"
+  },
+  "tabs": {
+    "close": "Close tab"
   },
   "bookmarks": {
     "title": "Bookmarks",
@@ -191,6 +201,8 @@
     "split": "PDF split",
     "error": "Something went wrong",
     "compressed": "PDF compressed",
-    "optimized": "PDF optimized"
+    "optimized": "PDF optimized",
+    "converted": "Converted to PDF",
+    "signatureAdded": "Signature added"
   }
 }

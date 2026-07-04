@@ -415,6 +415,35 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
   return doc.save()
 }
 
+export async function addSignatureImage(
+  bytes: Uint8Array,
+  pageIndex: number,
+  imageFile: File,
+  options?: { x?: number; y?: number; width?: number; height?: number },
+): Promise<Uint8Array> {
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
+  const page = doc.getPage(pageIndex)
+  const { width: pageWidth, height: pageHeight } = page.getSize()
+  const imgBytes = new Uint8Array(await imageFile.arrayBuffer())
+  const isPng =
+    imageFile.type === 'image/png' || imageFile.name.toLowerCase().endsWith('.png')
+  const image = isPng ? await doc.embedPng(imgBytes) : await doc.embedJpg(imgBytes)
+
+  const width = options?.width ?? Math.min(180, pageWidth * 0.35)
+  const height = options?.height ?? (width * image.height) / image.width
+  const x = options?.x ?? pageWidth - width - 48
+  const y = options?.y ?? pageHeight - height - 48
+
+  page.drawImage(image, {
+    x,
+    y: pageHeight - y - height,
+    width,
+    height,
+  })
+
+  return doc.save()
+}
+
 export async function extractAllText(bytes: Uint8Array, password?: string) {
   const { pdf } = await loadPdfDocument(bytes, password)
   const parts: string[] = []

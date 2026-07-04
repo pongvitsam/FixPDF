@@ -92,7 +92,17 @@
     "pdfiumTitle": "PDFium engine (WASM)",
     "pdfiumHint": "ดึงข้อความและ render หน้าด้วย Google PDFium",
     "pdfiumExtract": "ดึงข้อความ (PDFium)",
-    "pdfiumRender": "Render PNG (PDFium)"
+    "pdfiumRender": "Render PNG (PDFium)",
+    "signatureTitle": "ลายเซ็นรูปภาพ",
+    "signatureHint": "วางลายเซ็น PNG/JPG บนหน้าปัจจุบัน (มุมล่างขวา)",
+    "addSignature": "ใส่ลายเซ็น",
+    "convertTitle": "แปลงเป็น PDF",
+    "convertHint": "แปลง Word (.docx) หรือ HTML เป็น PDF ในเบราว์เซอร์",
+    "wordToPdf": "Word → PDF",
+    "htmlToPdf": "HTML → PDF"
+  },
+  "tabs": {
+    "close": "ปิดแท็บ"
   },
   "bookmarks": {
     "title": "บุ๊กมาร์ก",
@@ -191,6 +201,8 @@
     "split": "แยก PDF แล้ว",
     "error": "เกิดข้อผิดพลาด",
     "compressed": "บีบอัด PDF แล้ว",
-    "optimized": "Optimize PDF แล้ว"
+    "optimized": "Optimize PDF แล้ว",
+    "converted": "แปลงเป็น PDF แล้ว",
+    "signatureAdded": "ใส่ลายเซ็นแล้ว"
   }
 }

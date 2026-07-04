@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from './components/ui'
+import { DocumentTabs } from './components/DocumentTabs'
 import { usePdf, usePdfDispatch } from './context/PdfContext'
 import { savePdfBytes } from './lib/files'
 import { AnnotatePanel } from './features/annotate/AnnotatePanel'
@@ -151,6 +152,8 @@ export default function App() {
           {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
         </Button>
       </header>
+
+      <DocumentTabs />
 
       <div className="flex min-h-0 flex-1">
         <nav className="flex w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-2 print:hidden">

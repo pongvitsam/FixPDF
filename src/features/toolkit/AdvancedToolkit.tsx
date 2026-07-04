@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   FileImage,
   FileText,
+  FileType2,
   Hash,
   ImagePlus,
   Layers2,
@@ -31,6 +32,7 @@ import {
   editPdfMetadata,
   stripMetadataQpdf,
 } from '../../lib/pdf/operations'
+import { docxToPdf, htmlFileToPdf } from '../../lib/pdf/convert'
 import { loadPdfDocument, renderPageToImage } from '../../lib/pdf/viewer'
 
 export function AdvancedToolkit() {
@@ -64,8 +66,58 @@ export function AdvancedToolkit() {
       input.click()
     })
 
+  const pickDocx = () =>
+    new Promise<File | null>((resolve) => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      input.onchange = () => resolve(input.files?.[0] ?? null)
+      input.click()
+    })
+
+  const pickHtml = () =>
+    new Promise<File | null>((resolve) => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.html,.htm,text/html'
+      input.onchange = () => resolve(input.files?.[0] ?? null)
+      input.click()
+    })
+
   return (
     <div className="space-y-3">
+      <Panel title={t('toolkit.convertTitle')}>
+        <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.convertHint')}</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            onClick={() =>
+              void run(async () => {
+                const file = await pickDocx()
+                if (!file) return
+                const output = await docxToPdf(file)
+                await replaceBytes(output, file.name.replace(/\.docx$/i, '.pdf'))
+                showToast('toast.converted')
+              })
+            }
+          >
+            <FileType2 className="size-4" /> {t('toolkit.wordToPdf')}
+          </Button>
+          <Button
+            onClick={() =>
+              void run(async () => {
+                const file = await pickHtml()
+                if (!file) return
+                const output = await htmlFileToPdf(file)
+                await replaceBytes(output, file.name.replace(/\.html?$/i, '.pdf'))
+                showToast('toast.converted')
+              })
+            }
+          >
+            <FileText className="size-4" /> {t('toolkit.htmlToPdf')}
+          </Button>
+        </div>
+      </Panel>
+
       <Panel title={t('toolkit.pdfiumTitle')}>
         <p className="mb-3 text-xs text-[var(--muted)]">{t('toolkit.pdfiumHint')}</p>
         <div className="grid grid-cols-2 gap-2">

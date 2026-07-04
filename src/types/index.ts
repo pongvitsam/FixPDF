@@ -1,3 +1,13 @@
+export type OpenDocument = {
+  id: string
+  fileName: string
+  bytes: Uint8Array
+  pdfPassword: string | null
+  metadata: PdfMetadata | null
+  pageCount: number
+  currentPage: number
+}
+
 export type SidebarPanel =
   | 'home'
   | 'view'
