@@ -10,7 +10,7 @@ import { FileUp } from 'lucide-react'
 import { usePdf, usePdfDispatch } from '../../context/PdfContext'
 import { readDroppedPdfFiles } from '../../lib/files'
 import { TextLayer } from 'pdfjs-dist'
-import { loadPdfDocument, renderPageToCanvas } from '../../lib/pdf/viewer'
+import { loadPdfDocument, pdfjsLib, renderPageToCanvas } from '../../lib/pdf/viewer'
 import type { AnnotationKind } from '../../types'
 
 const kindColors: Record<AnnotationKind, string> = {
@@ -52,41 +52,51 @@ export function PdfViewer() {
 
   useEffect(() => {
     if (!bytes || !canvasRef.current) return
-    let cancelled = false
+    const controller = new AbortController()
     textLayerTaskRef.current?.cancel()
 
     void (async () => {
-      const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
-      if (cancelled) return
-      const page = await pdf.getPage(currentPage + 1)
-      const baseViewport = page.getViewport({ scale: 1, rotation })
-      setPageWidth(baseViewport.width)
+      try {
+        const { pdf } = await loadPdfDocument(bytes, pdfPassword ?? undefined)
+        if (controller.signal.aborted) return
+        const page = await pdf.getPage(currentPage + 1)
+        if (controller.signal.aborted) return
+        const baseViewport = page.getViewport({ scale: 1, rotation })
+        setPageWidth(baseViewport.width)
 
-      const vp = await renderPageToCanvas(
-        pdf,
-        currentPage,
-        zoom,
-        canvasRef.current!,
-        rotation,
-      )
-      setViewport({ width: vp.width, height: vp.height })
+        const vp = await renderPageToCanvas(
+          pdf,
+          currentPage,
+          zoom,
+          canvasRef.current!,
+          rotation,
+          { signal: controller.signal },
+        )
+        if (controller.signal.aborted) return
+        setViewport({ width: vp.width, height: vp.height })
 
-      if (textLayerRef.current && viewerTool === 'select') {
-        textLayerRef.current.replaceChildren()
-        const textLayer = new TextLayer({
-          textContentSource: await page.getTextContent(),
-          container: textLayerRef.current,
-          viewport: vp,
-        })
-        textLayerTaskRef.current = textLayer
-        await textLayer.render()
-      } else if (textLayerRef.current) {
-        textLayerRef.current.replaceChildren()
+        if (textLayerRef.current && viewerTool === 'select') {
+          textLayerRef.current.replaceChildren()
+          const textLayer = new TextLayer({
+            textContentSource: await page.getTextContent(),
+            container: textLayerRef.current,
+            viewport: vp,
+          })
+          textLayerTaskRef.current = textLayer
+          await textLayer.render()
+        } else if (textLayerRef.current) {
+          textLayerRef.current.replaceChildren()
+        }
+      } catch (error) {
+        if (controller.signal.aborted) return
+        if (error instanceof pdfjsLib.RenderingCancelledException) return
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        throw error
       }
     })()
 
     return () => {
-      cancelled = true
+      controller.abort()
       textLayerTaskRef.current?.cancel()
     }
   }, [bytes, currentPage, zoom, rotation, pdfPassword, viewerTool])

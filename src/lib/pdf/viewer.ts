@@ -25,6 +25,7 @@ export async function loadPdfDocument(
     const loadingTask = pdfjsLib.getDocument({
       data: bytes.slice(),
       password: knownPassword,
+      verbosity: pdfjsLib.VerbosityLevel.ERRORS,
     })
 
     loadingTask.onPassword = (
@@ -59,8 +60,13 @@ export async function renderPageToCanvas(
   scale: number,
   canvas: HTMLCanvasElement,
   rotation = 0,
+  options?: { signal?: AbortSignal },
 ) {
   const page = await pdf.getPage(pageIndex + 1)
+  if (options?.signal?.aborted) {
+    throw new DOMException('Render aborted', 'AbortError')
+  }
+
   const viewport = page.getViewport({ scale, rotation })
   const context = canvas.getContext('2d')
   if (!context) throw new Error('Canvas context unavailable')
@@ -68,7 +74,26 @@ export async function renderPageToCanvas(
   canvas.width = viewport.width
   canvas.height = viewport.height
 
-  await page.render({ canvasContext: context, viewport, canvas }).promise
+  const task = page.render({
+    canvasContext: context,
+    viewport,
+    canvas,
+    annotationMode: pdfjsLib.AnnotationMode.DISABLE,
+  })
+
+  if (options?.signal) {
+    options.signal.addEventListener('abort', () => task.cancel(), { once: true })
+  }
+
+  try {
+    await task.promise
+  } catch (error) {
+    if (error instanceof pdfjsLib.RenderingCancelledException) {
+      throw error
+    }
+    throw error
+  }
+
   return viewport
 }
 
